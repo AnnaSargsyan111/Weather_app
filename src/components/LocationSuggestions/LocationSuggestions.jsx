@@ -4,8 +4,8 @@ function formatMeta(result) {
   return [result.region, result.country].filter(Boolean).join(", ");
 }
 
-export default function LocationSuggestions({ results, loading, activeIndex, onSelect, onHover, listId }) {
-  if (loading) {
+export default function LocationSuggestions({ status, results, activeIndex, onSelect, onHover, listId }) {
+  if (status === "loading") {
     return (
       <div className={styles.popover}>
         <p className={styles.loading}>Searching…</p>
@@ -13,6 +13,7 @@ export default function LocationSuggestions({ results, loading, activeIndex, onS
     );
   }
 
+  // status is "done" here (LocationSearch never renders this component while idle)
   if (results.length === 0) {
     return (
       <div className={styles.popover} role="status">

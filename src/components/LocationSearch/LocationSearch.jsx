@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { PiMagnifyingGlassBold } from "react-icons/pi";
-import { useLocationSearch } from "../../hooks/useLocationSearch.js";
+import { useLocationSearch, MIN_QUERY_LENGTH } from "../../hooks/useLocationSearch.js";
 import LocationSuggestions from "../LocationSuggestions/LocationSuggestions.jsx";
 import styles from "./LocationSearch.module.css";
 
@@ -8,7 +8,7 @@ export default function LocationSearch({ onSelect }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const { results, loading } = useLocationSearch(query);
+  const { status, results } = useLocationSearch(query);
   const wrapperRef = useRef(null);
   const listId = "location-suggestions";
 
@@ -51,7 +51,7 @@ export default function LocationSearch({ onSelect }) {
     }
   }
 
-  const showDropdown = open && query.trim().length > 0;
+  const showDropdown = open && query.trim().length >= MIN_QUERY_LENGTH && status !== "idle";
 
   return (
     <div className={styles.wrapper} ref={wrapperRef}>
@@ -77,8 +77,8 @@ export default function LocationSearch({ onSelect }) {
       </div>
       {showDropdown && (
         <LocationSuggestions
+          status={status}
           results={results}
-          loading={loading}
           activeIndex={activeIndex}
           onSelect={handleSelect}
           onHover={setActiveIndex}
