@@ -1,0 +1,87 @@
+import { useState } from "react";
+import Header from "./components/Header/Header.jsx";
+import CurrentWeather from "./components/CurrentWeather/CurrentWeather.jsx";
+import WeatherMetrics from "./components/WeatherMetrics/WeatherMetrics.jsx";
+import WeatherMap from "./components/WeatherMap/WeatherMap.jsx";
+import ErrorState from "./components/ErrorState/ErrorState.jsx";
+import { WeatherSkeleton, MetricsSkeleton, MapSkeleton } from "./components/LoadingState/LoadingState.jsx";
+import { useSavedLocations } from "./hooks/useSavedLocations.js";
+import { useTheme } from "./hooks/useTheme.js";
+import { useTemperatureUnit } from "./hooks/useTemperatureUnit.js";
+import { useWeather } from "./hooks/useWeather.js";
+import styles from "./App.module.css";
+
+export default function App() {
+  const { locations, activeLocation, addLocation, removeLocation, selectLocation } = useSavedLocations();
+  const [theme, setTheme] = useTheme();
+  const [unit, setUnit] = useTemperatureUnit();
+  const { data: weather, loading, error } = useWeather(activeLocation);
+  const [geoError, setGeoError] = useState(null);
+
+  return (
+    <div className={styles.app}>
+      <Header
+        locations={locations}
+        activeLocationId={activeLocation?.id}
+        unit={unit}
+        theme={theme}
+        onSelectLocation={selectLocation}
+        onRemoveLocation={removeLocation}
+        onAddLocation={addLocation}
+        onLocate={addLocation}
+        onGeoError={setGeoError}
+        onThemeChange={setTheme}
+        onUnitChange={setUnit}
+      />
+
+      <main className={styles.main}>
+        {geoError && (
+          <div className={styles.banner}>
+            <ErrorState message={geoError} />
+          </div>
+        )}
+
+        {!activeLocation ? (
+          <div className={`${styles.card} ${styles.emptyState}`}>
+            <p className={styles.emptyStateTitle}>No locations yet</p>
+            <p className={styles.emptyStateSubtitle}>Search for a city above to see its weather.</p>
+          </div>
+        ) : (
+          <div className={styles.content}>
+            <div className={styles.leftColumn}>
+              <div className={styles.card}>
+                {loading && !weather ? (
+                  <WeatherSkeleton />
+                ) : error ? (
+                  <ErrorState message={error} />
+                ) : weather ? (
+                  <CurrentWeather location={activeLocation} weather={weather} unit={unit} />
+                ) : null}
+              </div>
+
+              <div>
+                {loading && !weather ? (
+                  <MetricsSkeleton />
+                ) : weather ? (
+                  <WeatherMetrics weather={weather} unit={unit} />
+                ) : null}
+              </div>
+            </div>
+
+            <div className={styles.mapColumn}>
+              {loading && !weather ? (
+                <MapSkeleton />
+              ) : weather ? (
+                <WeatherMap location={activeLocation} temperature={weather.temperature} unit={unit} />
+              ) : (
+                <div className={`${styles.card} ${styles.emptyState}`}>
+                  <p className={styles.emptyStateSubtitle}>Map unavailable</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}

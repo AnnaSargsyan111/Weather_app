@@ -1,0 +1,23 @@
+{
+  "name": "weather-app",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A premium, production-quality weather dashboard built with React, Vite, Open-Meteo and OpenStreetMap.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.3.0",
+    "leaflet": "^1.9.4",
+    "react-leaflet": "^4.2.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
+  }
+}

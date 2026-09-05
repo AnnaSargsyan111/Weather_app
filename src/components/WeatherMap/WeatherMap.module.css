@@ -1,0 +1,84 @@
+.wrapper {
+  position: relative;
+  height: 100%;
+  min-height: 280px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.map {
+  height: 100%;
+  width: 100%;
+  min-height: 280px;
+  background: var(--color-surface);
+}
+
+/* OpenStreetMap only offers light tiles for free (dark tiles require a paid/keyed
+   provider) - approximate a dark map with a CSS filter so it doesn't clash with the
+   Dark theme. Only the tile layer is inverted, not markers/controls. */
+:global([data-theme="dark"]) .map :global(.leaflet-tile-pane) {
+  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.88) saturate(0.9);
+}
+
+.openButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 13px;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.15s ease;
+}
+
+.openButton:hover {
+  background: var(--color-surface-hover);
+}
+
+.marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translate(-50%, -100%);
+}
+
+.markerBadge {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  padding: 3px 9px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+  margin-bottom: 2px;
+}
+
+.markerPin {
+  width: 14px;
+  height: 14px;
+  border-radius: 50% 50% 50% 0;
+  background: var(--color-accent);
+  transform: rotate(-45deg);
+  border: 2px solid var(--color-surface);
+}
+
+.fallback {
+  height: 100%;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  background: var(--color-surface-hover);
+}

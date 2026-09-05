@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Netlify local dev/build output
+.netlify/
+
+# OS files
+.DS_Store
+Thumbs.db
