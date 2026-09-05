@@ -5,11 +5,13 @@ import WeatherMetrics from "./components/WeatherMetrics/WeatherMetrics.jsx";
 import WeatherMap from "./components/WeatherMap/WeatherMap.jsx";
 import ErrorState from "./components/ErrorState/ErrorState.jsx";
 import DismissibleWarning from "./components/ErrorState/DismissibleWarning.jsx";
+import WeatherAtmosphere from "./components/WeatherAtmosphere/WeatherAtmosphere.jsx";
 import { WeatherSkeleton, MetricsSkeleton, MapSkeleton } from "./components/LoadingState/LoadingState.jsx";
 import { useSavedLocations } from "./hooks/useSavedLocations.js";
 import { useTheme } from "./hooks/useTheme.js";
 import { useTemperatureUnit } from "./hooks/useTemperatureUnit.js";
 import { useWeather } from "./hooks/useWeather.js";
+import { useAtmosphereScene } from "./hooks/useAtmosphereScene.js";
 import styles from "./App.module.css";
 
 export default function App() {
@@ -18,9 +20,11 @@ export default function App() {
   const [unit, setUnit] = useTemperatureUnit();
   const { data: weather, loading, error } = useWeather(activeLocation);
   const [geoError, setGeoError] = useState(null);
+  const scene = useAtmosphereScene(weather);
 
   return (
     <div className={styles.app}>
+      <WeatherAtmosphere scene={scene} />
       <Header
         locations={locations}
         activeLocationId={activeLocation?.id}

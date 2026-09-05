@@ -11,6 +11,8 @@ const CURRENT_PARAMS = [
   "wind_direction_10m",
   "dew_point_2m",
   "visibility",
+  "cloud_cover",
+  "precipitation",
 ].join(",");
 
 const DAILY_PARAMS = ["sunrise", "sunset", "temperature_2m_max", "temperature_2m_min"].join(",");
@@ -33,6 +35,7 @@ export async function getWeather(latitude, longitude) {
 
   return {
     timezone: data.timezone,
+    time: current.time,
     temperature: current.temperature_2m,
     apparentTemperature: current.apparent_temperature,
     humidity: current.relative_humidity_2m,
@@ -43,6 +46,8 @@ export async function getWeather(latitude, longitude) {
     windDirection: current.wind_direction_10m,
     dewPoint: current.dew_point_2m,
     visibility: current.visibility,
+    cloudCover: current.cloud_cover,
+    precipitation: current.precipitation,
     sunrise: daily.sunrise?.[0],
     sunset: daily.sunset?.[0],
     tempMax: daily.temperature_2m_max?.[0],

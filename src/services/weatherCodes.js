@@ -31,6 +31,14 @@ const WEATHER_CODES = {
   99: { label: "Thunderstorm w/ Hail", icon: "thunderstorm" },
 };
 
+// Groups an icon key into the precipitation type the atmosphere renderer cares about.
+export function getPrecipitationKind(icon) {
+  if (icon === "rain" || icon === "drizzle" || icon === "sleet") return "rain";
+  if (icon === "snow") return "snow";
+  if (icon === "thunderstorm") return "thunderstorm";
+  return "none";
+}
+
 export function getWeatherCondition(code, isDay = true) {
   const entry = WEATHER_CODES[code] || { label: "Unknown", icon: "cloudy" };
   if (entry.icon === "clear" && !isDay) {

@@ -34,12 +34,17 @@ this file if needed) — never hardcode a key into source.
 - `src/components/*` — one folder per UI piece: `Header`, `LocationSearch`,
   `LocationSuggestions`, `CurrentLocationButton`, `LocationChip`, `LocationMenu`,
   `ThemeSelector`, `TemperatureUnitSelector`, `CurrentWeather`, `WeatherIcon`,
-  `WeatherMetrics` + `MetricCard`, `WeatherMap`, `LoadingState`, `ErrorState`.
+  `WeatherMetrics` + `MetricCard`, `WeatherMap`, `LoadingState`, `ErrorState`,
+  `InfoTooltip` (portal-rendered metric explanations), `WeatherAtmosphere` (the
+  time/weather-driven background scene — sky, sun/moon, stars, clouds, fog,
+  canvas-based rain/snow particles).
 - `src/hooks/*` — state and data-fetching logic, kept out of components:
   `useSavedLocations` (locations + active id, persisted), `useTheme`,
-  `useTemperatureUnit`, `useLocationSearch` (debounced autocomplete),
+  `useTemperatureUnit`, `useLocationSearch` (debounced autocomplete, 2-char minimum),
   `useWeather` (fetch for a given location), `useGeolocation` (browser geolocation +
-  reverse geocode).
+  reverse geocode), `useAtmosphereScene` (derives the atmosphere's scene data from
+  weather + real sunrise/sunset — see `src/utils/daylight.js` for the continuous,
+  non-abrupt day/night math), `usePrefersReducedMotion`.
 - `src/services/*` — the only files that call `fetch()` against external APIs.
   Components/hooks never call `fetch` directly.
 - Top-level state lives in `src/App.jsx` and is passed down as props — no Redux/Context,
@@ -53,8 +58,24 @@ this file if needed) — never hardcode a key into source.
 - Before pushing to GitHub or changing anything in the live Netlify site, confirm with
   Anna first (visible/shared actions).
 
+## WeatherAtmosphere (background scene)
+
+A `position: fixed; z-index: -1` layer behind the whole app (see
+`src/components/WeatherAtmosphere/`). Important gotcha: it MUST use a **negative**
+z-index, not `0` — a positioned fixed element with `z-index: 0` paints *above*
+non-positioned normal-flow content per CSS stacking rules, which would cover the
+entire UI. Rain/snow render on a single `<canvas>` (not per-particle DOM nodes) via
+`requestAnimationFrame`, paused on `visibilitychange` and skipped entirely under
+`prefers-reduced-motion`. Day/night is a continuous function of real sunrise/sunset
+(no fixed-hour cutoffs) recomputed every 60s — see `computeDaylight` in
+`src/utils/daylight.js`. This was intentionally scoped down from a much larger request
+(scroll parallax, lightning, wind-driven card jitter were deferred) — see git history
+if extending it further.
+
 ## Roadmap ideas (not yet built)
 
 - Multi-day forecast strip (Open-Meteo's `daily` block already has the data available).
 - Optional Google Maps mode behind a `VITE_GOOGLE_MAPS_API_KEY` env var, if Anna decides
   she wants Google's map styling badly enough to set up billing for it.
+- Atmosphere follow-ups if wanted: subtle scroll parallax for sun/moon, restrained
+  lightning flashes during thunderstorms, very slight wind-driven card jitter.

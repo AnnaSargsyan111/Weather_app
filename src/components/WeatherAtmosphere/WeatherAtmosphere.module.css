@@ -1,0 +1,95 @@
+.atmosphere {
+  position: fixed;
+  inset: 0;
+  /* Negative so this fixed layer paints behind the app's normal-flow content
+     (which is non-positioned and would otherwise sit below a z-index:0 sibling
+     in the stacking order) while still staying above the plain body background. */
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.sky {
+  position: absolute;
+  inset: 0;
+  transition: opacity 1.8s ease;
+}
+
+.celestial {
+  position: absolute;
+  border-radius: 50%;
+  transition: left 3s ease, top 3s ease, opacity 2.5s ease;
+  transform: translate(-50%, -50%);
+}
+
+.sun {
+  width: 90px;
+  height: 90px;
+  background: radial-gradient(circle, rgba(255, 226, 170, 0.95) 0%, rgba(255, 200, 120, 0.35) 45%, rgba(255, 200, 120, 0) 72%);
+}
+
+.moon {
+  width: 46px;
+  height: 46px;
+  background: radial-gradient(circle at 38% 35%, #fdfdfa 0%, #e4e6ee 55%, rgba(228, 230, 238, 0.15) 75%);
+  box-shadow: 0 0 30px rgba(220, 225, 245, 0.25);
+}
+
+.stars {
+  position: absolute;
+  inset: 0;
+  transition: opacity 1.8s ease;
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #fff;
+  animation: twinkle 4s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+.clouds {
+  position: absolute;
+  inset: 0;
+  transition: opacity 1.8s ease;
+}
+
+.cloud {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(30px);
+  animation: drift linear infinite;
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(-15vw);
+  }
+  to {
+    transform: translateX(115vw);
+  }
+}
+
+.fog {
+  position: absolute;
+  inset: 0;
+  transition: opacity 2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cloud,
+  .star {
+    animation: none;
+  }
+}
