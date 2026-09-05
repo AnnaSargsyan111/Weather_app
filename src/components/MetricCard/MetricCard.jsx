@@ -1,11 +1,13 @@
+import InfoTooltip from "../InfoTooltip/InfoTooltip.jsx";
 import styles from "./MetricCard.module.css";
 
-export default function MetricCard({ icon: Icon, label, value, unit, context }) {
+export default function MetricCard({ icon: Icon, label, value, unit, context, description }) {
   return (
     <div className={styles.card}>
       <div className={styles.top}>
         <Icon size={18} className={styles.icon} aria-hidden="true" />
         <span className={styles.label}>{label}</span>
+        {description && <InfoTooltip label={label} description={description} />}
       </div>
       <div>
         <span className={styles.value}>{value}</span>

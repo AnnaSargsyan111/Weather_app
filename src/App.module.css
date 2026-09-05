@@ -13,10 +13,6 @@
   box-sizing: border-box;
 }
 
-.banner {
-  margin-bottom: 20px;
-}
-
 .content {
   display: grid;
   grid-template-columns: 1.4fr 1fr;

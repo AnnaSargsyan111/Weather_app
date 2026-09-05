@@ -4,6 +4,7 @@ import CurrentWeather from "./components/CurrentWeather/CurrentWeather.jsx";
 import WeatherMetrics from "./components/WeatherMetrics/WeatherMetrics.jsx";
 import WeatherMap from "./components/WeatherMap/WeatherMap.jsx";
 import ErrorState from "./components/ErrorState/ErrorState.jsx";
+import DismissibleWarning from "./components/ErrorState/DismissibleWarning.jsx";
 import { WeatherSkeleton, MetricsSkeleton, MapSkeleton } from "./components/LoadingState/LoadingState.jsx";
 import { useSavedLocations } from "./hooks/useSavedLocations.js";
 import { useTheme } from "./hooks/useTheme.js";
@@ -35,11 +36,7 @@ export default function App() {
       />
 
       <main className={styles.main}>
-        {geoError && (
-          <div className={styles.banner}>
-            <ErrorState message={geoError} />
-          </div>
-        )}
+        {geoError && <DismissibleWarning message={geoError} onDismiss={() => setGeoError(null)} />}
 
         {!activeLocation ? (
           <div className={`${styles.card} ${styles.emptyState}`}>
