@@ -1,17 +1,22 @@
 .grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  /* minmax(0, 1fr), not bare 1fr - bare 1fr defaults to minmax(auto, 1fr), which can't
+     shrink a track below its content's min-content width. A card's icon+label content
+     forcing tracks wider than their fair share is exactly how a card ends up spilling
+     past .leftColumn and overlapping the map next to it (same fix already applied to
+     the forecast calendar's 7-column grid - see the gotcha note in CLAUDE.md). */
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
 }
 
 @media (max-width: 1024px) {
   .grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 640px) {
   .grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

@@ -197,7 +197,10 @@ a literal app-wide 2x risked overflowing tightly-sized contexts like 44px circul
 header buttons that were never part of this thread) to just this metrics-card area:
 `MetricCard`'s weather-type icon (`Icon size={...}` in `MetricCard.jsx`) went 18px →
 36px, and `InfoTooltip`'s trigger went 18px/13px-glyph → 36px/26px-glyph. Nowhere else
-in the app was touched.
+in the app was touched. **Update 4**: the 36px weather-type icon triggered a real grid
+overflow bug (see `WeatherMetrics` below) and was reverted back to 18px; `InfoTooltip`'s
+trigger was left at 36px/26px since only the weather-type icon was reported as the
+problem.
 
 Section titles across `WeatherDetails`/`WeatherForecastCalendar`/`WeatherOverview`/
 `WeatherNews` are now uniformly 18px/700/`var(--color-text)` -
@@ -377,7 +380,15 @@ as "Aug 31" during testing). Both `isoDate()` helpers (in the hook and in
 The grid uses `grid-template-columns: repeat(7, minmax(0, 1fr))` (not bare `1fr`) — a
 bare `1fr` grid blew out past the viewport on mobile because it doesn't allow tracks to
 shrink below their content's min-content width; `minmax(0, 1fr)` plus `min-width: 0` on
-`.cell` fixed it. The glass-panel look (`.glassPanel` in
+`.cell` fixed it. **The exact same bug recurred** in `WeatherMetrics.module.css`'s
+5/3/2-column grid (also bare `repeat(N, 1fr)`) once the metric icons were briefly
+doubled to 36px: the wider icon+label content forced grid tracks past their fair share,
+overflowing `.leftColumn` and visually spilling the last card (Dew Point) onto the map
+column next to it. Fixed the same way - `minmax(0, 1fr)` at all three breakpoints plus
+`min-width: 0` on `MetricCard`'s `.card` - rather than moving the map, since that would
+have papered over the actual overflow instead of fixing it; this holds regardless of
+icon size, so it can't recur even if the icons change again later. The glass-panel look
+(`.glassPanel` in
 `WeatherForecastCalendar.module.css`) uses `color-mix(in srgb, var(--color-surface) 72%,
 transparent)` + `backdrop-filter: blur()` so it stays theme-aware rather than a fixed
 dark-only background. A standalone "16-Day Forecast" section used to exist separately
