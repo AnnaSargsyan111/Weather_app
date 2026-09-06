@@ -11,12 +11,12 @@ export function roundForDisplay(value) {
   return String(Math.round(value * 10) / 10);
 }
 
-export function formatTemp(celsius, unit) {
-  if (celsius === null || celsius === undefined || Number.isNaN(celsius)) return "--°";
-  const value = unit === "F" ? celsiusToFahrenheit(celsius) : celsius;
-  return `${Math.round(value)}°`;
-}
-
 export function unitLabel(unit) {
   return unit === "F" ? "°F" : "°C";
+}
+
+export function formatTemp(celsius, unit) {
+  if (celsius === null || celsius === undefined || Number.isNaN(celsius)) return `--${unitLabel(unit)}`;
+  const value = unit === "F" ? celsiusToFahrenheit(celsius) : celsius;
+  return `${Math.round(value)}${unitLabel(unit)}`;
 }

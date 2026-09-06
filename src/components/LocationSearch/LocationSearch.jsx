@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { PiMagnifyingGlassBold } from "react-icons/pi";
-import { useLocationSearch, MIN_QUERY_LENGTH } from "../../hooks/useLocationSearch.js";
+import { useLocationSearch } from "../../hooks/useLocationSearch.js";
 import LocationSuggestions from "../LocationSuggestions/LocationSuggestions.jsx";
 import styles from "./LocationSearch.module.css";
 
@@ -51,7 +51,10 @@ export default function LocationSearch({ onSelect }) {
     }
   }
 
-  const showDropdown = open && query.trim().length >= MIN_QUERY_LENGTH && status !== "idle";
+  // The hook itself stays "idle" for an empty or too-short valid query, and jumps
+  // straight to "done" (skipping the length gate) for a non-Latin query - so "not
+  // idle" alone is the correct signal for whether the dropdown has anything to show.
+  const showDropdown = open && status !== "idle";
 
   return (
     <div className={styles.wrapper} ref={wrapperRef}>
