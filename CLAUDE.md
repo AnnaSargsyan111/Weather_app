@@ -560,6 +560,26 @@ pane's hidden/backgrounded state throttles `ResizeObserver` callbacks the same w
 throttles `requestAnimationFrame` (documented elsewhere in this file for scroll/rAF) -
 `document.hidden` must read `false` before trusting a live measurement from it here.
 
+## Forecast calendar grid: the `slice(-0)` gotcha
+
+Clicking a month tab whose 1st falls on a **Sunday** (e.g. Nov 2026, Aug 2027) used to
+flood the grid with the *entire* previous month instead of showing zero leading days.
+Root cause, in [ForecastGrid.jsx](weather-app/src/components/WeatherForecastCalendar/ForecastGrid.jsx):
+`leadingCount = month.days[0]?.weekday ?? 0` correctly evaluates to `0` when day 1 is a
+Sunday, but `previousMonth.days.slice(-leadingCount)` then becomes `.slice(-0)` - and in
+JS, `-0` is not `< 0` (the slice spec's negativity check is a strict `<`), so it falls
+through to the same branch as `.slice(0)` and returns a **full copy of the array**
+instead of an empty one. This is a general `Array.prototype.slice` footgun, not specific
+to dates - any `arr.slice(-n)` where `n` can legitimately be `0` has the same trap.
+Fixed by explicitly short-circuiting `leadingCount === 0` to `[]` before ever calling
+`.slice()`, rather than relying on slice's own handling of the zero case. The rest of
+the calendar's date math (weekday via `date.getDay()`, month length via
+`new Date(y, m+1, 0).getDate()`, month rollover via the `Date` constructor's own
+overflow handling in `useForecastCalendar.js`) was already correct and needed no
+changes - verified programmatically across all 12 months in the rolling window
+(Sep 2026 - Aug 2027), including both Sunday-start months and the Saturday-start month
+(May 2027, the year's only 6-day leading case) and the 28-day month (Feb 2027).
+
 ## Roadmap ideas (not yet built)
 
 - Optional Google Maps mode behind a `VITE_GOOGLE_MAPS_API_KEY` env var, if Anna decides

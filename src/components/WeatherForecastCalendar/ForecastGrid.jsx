@@ -20,7 +20,19 @@ function isSameDate(dateStr) {
 
 export default function ForecastGrid({ month, previousMonth, nextMonth, unit, filter }) {
   const leadingCount = month.days[0]?.weekday ?? 0;
-  const leadingCells = previousMonth ? previousMonth.days.slice(-leadingCount) : Array(leadingCount).fill(null);
+  // leadingCount is 0 whenever the 1st of the month falls on a Sunday - and
+  // `array.slice(-0)` is a genuine JS footgun: -0 is not "< 0" (per spec, ToIntegerOrInfinity
+  // preserves the sign but the slice algorithm's negativity check treats -0 as non-negative),
+  // so slice(-0) falls through to the same branch as slice(0) and returns a COPY OF THE
+  // ENTIRE ARRAY instead of an empty one. That silently dumped the whole previous month
+  // into the grid as "leading" days every time a month started on a Sunday (e.g. Nov 1,
+  // 2026). Guard the zero case explicitly instead of relying on slice's own handling of it.
+  const leadingCells =
+    leadingCount === 0
+      ? []
+      : previousMonth
+      ? previousMonth.days.slice(-leadingCount)
+      : Array(leadingCount).fill(null);
 
   const totalSoFar = leadingCells.length + month.days.length;
   const trailingCount = (GRID_SIZE - (totalSoFar % GRID_SIZE)) % GRID_SIZE;
