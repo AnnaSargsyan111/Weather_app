@@ -149,10 +149,14 @@ fetches every real historical day from `EARLIEST_YEAR` (2024) through today **on
 uses), and `computeOverviewStats` in `src/utils/weatherOverviewHelpers.js` filters/
 aggregates that in-memory whenever the month/year selection changes — no refetch per
 filter change. `categorizeDayType` buckets every WMO weather code into exactly one of
-the 3 categories the donut needs: "Sunny" here means *no precipitation* (clear through
-overcast/fog lumped together), "Rainy" is any liquid/mixed/thunderstorm precip, "Snowy"
-is snow codes — this is a deliberate simplification since the widget only has 3 slices
-and every day must land in one. Year options are computed as `[currentYear-2 .. currentYear]`
+the 3 categories the donut needs: "Sunny" is clear/mainly clear and fog (no precip
+either way), "Snowy" is snow codes, and everything else - partly cloudy, overcast, and
+any liquid/mixed/thunderstorm precip - is combined into one "rainy" bucket, labeled
+"Cloudy/Rainy days" in the UI. This is a deliberate simplification since the widget only
+has 3 slices and every day must land in one; because it's a strict partition of every
+WMO code, the three counts always sum to the exact number of real days in the selection
+(e.g. a fully-elapsed past month totals to that month's real day count). Year options are
+computed as `[currentYear-2 .. currentYear]`
 rather than hardcoded, so the widget doesn't silently go stale (no future year is offered,
 since there's nothing real to show for it yet). Selecting the un-elapsed months of the
 current year correctly shows an honest "no recorded data yet" empty state instead of

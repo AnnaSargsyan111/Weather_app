@@ -73,7 +73,7 @@ export default function WeatherOverviewSection({ days, unit, loading }) {
             </div>
             <div className={styles.legendRow}>
               <span className={styles.legendDot} style={{ background: "#0094FF" }} />
-              Rainy days
+              Cloudy/Rainy days
               <span className={styles.legendValue} style={{ marginLeft: "auto" }}>
                 {stats.rainy.count} days ({stats.rainy.percent}%)
               </span>

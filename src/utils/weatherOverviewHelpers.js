@@ -1,12 +1,15 @@
-// Buckets a WMO weather code into one of exactly 3 categories for the overview donut -
-// "Sunny" here means "no precipitation" (clear through overcast/fog), not literally
-// cloudless, since the widget only has 3 slices and every day must land in one of them.
+// Buckets a WMO weather code into one of exactly 3 categories for the overview donut.
+// "Sunny" is clear/mainly clear (and fog, which carries no precipitation either) only -
+// partly cloudy and overcast are folded into the "rainy" bucket instead, which the UI
+// labels "Cloudy/Rainy days", so every non-clear, non-snowy sky condition lands in one
+// combined category rather than being counted as "sunny".
 const SNOW_CODES = new Set([71, 73, 75, 77, 85, 86]);
 const RAIN_CODES = new Set([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99]);
+const CLOUDY_CODES = new Set([2, 3]); // partly cloudy, overcast
 
 export function categorizeDayType(weatherCode) {
   if (SNOW_CODES.has(weatherCode)) return "snowy";
-  if (RAIN_CODES.has(weatherCode)) return "rainy";
+  if (RAIN_CODES.has(weatherCode) || CLOUDY_CODES.has(weatherCode)) return "rainy";
   return "sunny";
 }
 
