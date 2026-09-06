@@ -58,7 +58,7 @@ export function overviewTitle(selectedMonths, selectedYears) {
     return `Selected date: ${years[0]}-${years[years.length - 1]}`;
   }
   if (months.length > 1) {
-    return `Selected date: ${MONTH_ABBR[months[0]]}-${MONTH_ABBR[months[months.length - 1]]}`;
+    return `Selected date: ${MONTH_ABBR[months[0]]}-${MONTH_ABBR[months[months.length - 1]]}, ${years[0]}`;
   }
   return "Selected date";
 }

@@ -1,7 +1,8 @@
-const RADIUS = 54;
-const STROKE = 20;
+const SIZE = 180;
+const CENTER = SIZE / 2;
+const RADIUS = 76;
+const STROKE = 24;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-const CENTER = 64;
 
 const COLORS = {
   sunny: "#FF6B00",
@@ -20,8 +21,8 @@ export default function DonutChart({ stats, children }) {
   });
 
   return (
-    <div style={{ position: "relative", width: 128, height: 128 }}>
-      <svg width="128" height="128" viewBox="0 0 128 128">
+    <div style={{ position: "relative", width: SIZE, height: SIZE }}>
+      <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
         <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="none" stroke="var(--color-border)" strokeWidth={STROKE} />
         {segments.map(
           (segment) =>
@@ -41,17 +42,19 @@ export default function DonutChart({ stats, children }) {
             )
         )}
       </svg>
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        {children}
-      </div>
+      {children && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {children}
+        </div>
+      )}
     </div>
   );
 }

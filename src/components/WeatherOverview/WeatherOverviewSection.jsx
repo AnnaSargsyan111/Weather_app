@@ -33,7 +33,10 @@ export default function WeatherOverviewSection({ days, unit, loading }) {
   return (
     <div className={styles.card}>
       <div className={styles.header}>
-        <h2 className={styles.title}>Weather overview</h2>
+        <div>
+          <h2 className={styles.title}>Weather overview</h2>
+          <p className={styles.subtitle}>{overviewTitle(selectedMonths, selectedYears)}</p>
+        </div>
         <div className={styles.filters}>
           <MultiSelectFilter
             label="Month"
@@ -57,9 +60,7 @@ export default function WeatherOverviewSection({ days, unit, loading }) {
       ) : (
         <div className={styles.body}>
           <div className={styles.chartWrap}>
-            <DonutChart stats={stats}>
-              <span className={styles.chartCenterLabel}>{overviewTitle(selectedMonths, selectedYears)}</span>
-            </DonutChart>
+            <DonutChart stats={stats} />
           </div>
 
           <div className={styles.legend}>
