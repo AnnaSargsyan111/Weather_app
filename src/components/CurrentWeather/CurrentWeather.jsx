@@ -1,11 +1,13 @@
 import { getWeatherCondition } from "../../services/weatherCodes.js";
 import { formatTemp } from "../../utils/temperature.js";
 import { formatClockTime } from "../../utils/formatTime.js";
+import { useLocalClock } from "../../hooks/useLocalClock.js";
 import WeatherIcon from "../WeatherIcon/WeatherIcon.jsx";
 import styles from "./CurrentWeather.module.css";
 
 export default function CurrentWeather({ location, weather, unit }) {
   const condition = getWeatherCondition(weather.weatherCode, weather.isDay);
+  const localTime = useLocalClock(weather.timezone);
 
   return (
     <section className={styles.section} aria-label="Current weather">
@@ -13,6 +15,7 @@ export default function CurrentWeather({ location, weather, unit }) {
         <p className={styles.location}>
           {location.name}
           {location.country ? `, ${location.country}` : ""}
+          {localTime && <span className={styles.localTime}> • {localTime}</span>}
         </p>
         <div className={styles.tempRow}>
           <span className={styles.temp}>{formatTemp(weather.temperature, unit)}</span>

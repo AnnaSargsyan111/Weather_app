@@ -18,6 +18,11 @@
   margin: 0;
 }
 
+.localTime {
+  color: var(--color-text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
 .tempRow {
   display: flex;
   align-items: center;

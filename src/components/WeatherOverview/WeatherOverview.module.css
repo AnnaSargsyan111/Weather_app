@@ -8,11 +8,23 @@
   max-width: 560px;
 }
 
+/* Glass pill, not bare text - see WeatherDetails.module.css's .sectionTitle for why
+   (this title sits directly on the animated sky, which varies independently of the
+   manual Light/Dark theme). */
 .sectionTitle {
+  display: inline-flex;
+  align-items: center;
   font-size: 18px;
   font-weight: 700;
   color: var(--color-text);
   margin: 0;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
 }
 
 .card {

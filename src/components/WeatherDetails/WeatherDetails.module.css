@@ -5,16 +5,32 @@
 
 .sectionHeader {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 10px;
   margin-bottom: 16px;
 }
 
+/* A glass pill rather than bare text - this title sits directly on the animated sky
+   (WeatherAtmosphere), which can be anywhere from a bright noon blue to a near-black
+   night, independent of the manual Light/Dark theme. Plain `color: var(--color-text)`
+   text could land dark-on-dark (Light theme, night sky) or light-on-light (Dark theme,
+   bright day sky). The pill's own background dampens whatever's behind it and is
+   already paired with a contrasting text color by the existing --glass-bg/--color-text
+   tokens, so contrast holds regardless of the sky color underneath. */
 .sectionTitle {
+  display: inline-flex;
+  align-items: center;
   font-size: 18px;
   font-weight: 700;
   color: var(--color-text);
   margin: 0;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
 }
 
 .sectionTime {

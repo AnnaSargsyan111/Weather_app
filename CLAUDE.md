@@ -202,6 +202,30 @@ consistent with this session's broader pattern of the automated browser pane's p
 pipeline being unreliable while reported as hidden/backgrounded. Trust a screenshot or
 `.matches()` over `getComputedStyle` if this resurfaces.
 
+All four standalone page section titles (Weather details/forecast/overview/news - not
+"Climate information"/"Daily summary" etc., which already sit inside an opaque/glass
+card) are now a small glass pill (`--glass-bg`/`--glass-border`/`--glass-blur`,
+`border-radius: 999px`) rather than bare text, since they sit directly on the animated
+sky (`WeatherAtmosphere`), which varies independently of the manual Light/Dark theme -
+plain `color: var(--color-text)` text could land dark-on-dark (Light theme at night) or
+light-on-light (Dark theme in bright daylight). The pill's background dampens whatever
+sky color is behind it and is already paired with a contrasting text color by the
+existing tokens, so contrast holds in all four Light/Dark × day/night combinations.
+
+`CurrentWeather.jsx` shows a live local clock next to the location name ("Singapore,
+Singapore • 1:57 AM") via `useLocalClock(weather.timezone)`
+(`src/hooks/useLocalClock.js`) - `weather.timezone` is Open-Meteo's own resolved IANA
+timezone from `timezone=auto` (e.g. "Asia/Yerevan"), not guessed from coordinates.
+Deliberately distinct from `formatClockTime` (used for sunrise/sunset): those are naive
+local-wall-clock strings the API already returns in local time, so they're parsed
+directly with no timezone conversion; the live clock needs the opposite - converting the
+actual current instant into that timezone's wall-clock time - so it uses
+`Intl.DateTimeFormat` with the `timeZone` option, ticking via a plain 30s
+`setInterval`, correct enough for a "changes every minute" display without needing
+alignment to the exact minute boundary. Switching the active location updates the
+displayed time immediately, without waiting for the next tick, since the format simply
+reapplies to the same current instant using the new `timezone`.
+
 ## WeatherDetails (13-card detailed dashboard)
 
 `src/components/WeatherDetails/` — the "Weather details" section below the map, one
