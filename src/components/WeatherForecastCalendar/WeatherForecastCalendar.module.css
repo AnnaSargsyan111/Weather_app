@@ -1,0 +1,263 @@
+.section {
+  margin-top: 28px;
+}
+
+.glassPanel {
+  background: color-mix(in srgb, var(--color-surface) 72%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  transition: var(--transition-theme);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(to right, var(--color-text), var(--color-text-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.filters {
+  display: flex;
+  gap: 6px;
+}
+
+.filterButton {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.filterButton:hover {
+  border-color: var(--color-border-strong);
+}
+
+.filterButtonActive {
+  background: linear-gradient(to right, #fbbf24, #f97316);
+  border-color: transparent;
+  color: #1c1305;
+}
+
+/* --- Month Insight banner --- */
+
+.insightBanner {
+  composes: glassPanel;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.insightIcon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.insightText {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.insightText strong {
+  color: var(--color-text);
+}
+
+/* --- Month selector --- */
+
+.monthSelector {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 18px;
+  scrollbar-width: thin;
+}
+
+.monthTab {
+  composes: glassPanel;
+  flex-shrink: 0;
+  width: 108px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.monthTab:hover {
+  border-color: var(--color-border-strong);
+}
+
+.monthTabActive {
+  background: linear-gradient(135deg, #fbbf24, #f97316);
+  border-color: transparent;
+  color: #1c1305;
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.25);
+}
+
+.monthTabLabel {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.monthTabAvg {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+/* --- Calendar grid --- */
+
+.gridPanel {
+  composes: glassPanel;
+  padding: 18px;
+}
+
+.weekdayRow {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.weekdayLabel {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.cell {
+  min-width: 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  padding: 8px;
+  min-height: 92px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.cell:hover {
+  border-color: var(--color-border-strong);
+  transform: translateY(-1px);
+}
+
+.cellPadding {
+  opacity: 0.3;
+  filter: grayscale(0.6);
+}
+
+.cellTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.cellDate {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.cellBadge {
+  font-size: 9px;
+  font-weight: 700;
+  color: #1c6fb0;
+  background: rgba(56, 189, 248, 0.18);
+  border-radius: 999px;
+  padding: 2px 5px;
+  white-space: nowrap;
+}
+
+.cellIcon {
+  align-self: center;
+  color: var(--color-accent);
+  transition: transform 0.15s ease;
+}
+
+.cell:hover .cellIcon {
+  transform: scale(1.15);
+}
+
+.cellMetrics {
+  text-align: right;
+}
+
+.cellMetricsLabel {
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.cellMax {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.cellMin {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
+.heatCool {
+  background: rgba(56, 189, 248, 0.1);
+}
+.heatMild {
+  background: rgba(59, 130, 246, 0.08);
+}
+.heatWarm {
+  background: rgba(251, 191, 36, 0.1);
+}
+.heatHot {
+  background: rgba(249, 115, 22, 0.14);
+}
+
+.filterMatch {
+  outline: 2px solid #f97316;
+  outline-offset: -1px;
+}
+
+@media (max-width: 640px) {
+  .cell {
+    min-height: 76px;
+    padding: 6px;
+  }
+  .cellMax {
+    font-size: 12px;
+  }
+}

@@ -95,6 +95,27 @@ plus a `DetailCard`/`Badge` shell — deliberately kept on this app's existing C
 + react-icons stack rather than the Tailwind/Lucide the original design spec suggested,
 to avoid mixing two styling systems in one small app.
 
+## WeatherForecastCalendar ("Weather forecast" 12-month history)
+
+`src/components/WeatherForecastCalendar/` — the section below Weather Details: a
+12-month selector + heatmap calendar grid. **Important**: despite the "forecast" name
+(kept because that's what the user asked to call it), this shows real **historical**
+data from Open-Meteo's free Archive API (`src/services/historicalWeatherService.js`,
+`archive-api.open-meteo.com`), not predictions — genuine day-by-day forecasts 12 months
+out don't exist for any weather API. The original design spec asked for fabricated mock
+data and a fake "AI Trend Insight" sentence; both were replaced with real computed stats
+(see the Month Insight banner) to avoid ever presenting made-up numbers as real analysis.
+`useMonthlyHistory.js` fetches once per location and buckets the flat daily arrays into
+12 month objects (see the hook for the exact shape). The grid uses
+`grid-template-columns: repeat(7, minmax(0, 1fr))` (not bare `1fr`) — a bare `1fr` grid
+blew out past the viewport on mobile because it doesn't allow tracks to shrink below
+their content's min-content width; `minmax(0, 1fr)` plus `min-width: 0` on `.cell` fixed
+it. The glass-panel look (`.glassPanel` in `WeatherForecastCalendar.module.css`) uses
+`color-mix(in srgb, var(--color-surface) 72%, transparent)` + `backdrop-filter: blur()`
+so it stays theme-aware rather than the spec's fixed dark-only background. Day Detail
+drawer (hourly chart, UV/AQI/moon/clothing advisory) was scoped out of this pass — noted
+below.
+
 ## Roadmap ideas (not yet built)
 
 - Multi-day forecast strip (Open-Meteo's `daily` block already has the data available).
@@ -102,3 +123,5 @@ to avoid mixing two styling systems in one small app.
   she wants Google's map styling badly enough to set up billing for it.
 - Atmosphere follow-ups if wanted: subtle scroll parallax for sun/moon, restrained
   lightning flashes during thunderstorms, very slight wind-driven card jitter.
+- Day Detail slide-over drawer for the forecast calendar (hourly chart, UV/AQI/humidity/
+  moon-phase breakdown, clothing/activity advisory) when a calendar day is clicked.
