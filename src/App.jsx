@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Header from "./components/Header/Header.jsx";
 import CurrentWeather from "./components/CurrentWeather/CurrentWeather.jsx";
 import WeatherMetrics from "./components/WeatherMetrics/WeatherMetrics.jsx";
@@ -24,6 +24,7 @@ import { useForecastCalendar } from "./hooks/useForecastCalendar.js";
 import { useWeatherOverview } from "./hooks/useWeatherOverview.js";
 import { useWeatherNews } from "./hooks/useWeatherNews.js";
 import { useLocalClock } from "./hooks/useLocalClock.js";
+import { useMatchHeight } from "./hooks/useMatchHeight.js";
 import styles from "./App.module.css";
 
 export default function App() {
@@ -40,6 +41,13 @@ export default function App() {
   // Single source of truth for "the current local time at this location" - shared by
   // CurrentWeather and WeatherDetailsSection so they can never show two different times.
   const localTime = useLocalClock(weather?.timezone);
+  // The map column's height is set to exactly match the metrics column's real content
+  // height (see useMatchHeight) rather than via CSS grid stretch, which was padding the
+  // shorter column with invisible trailing space whenever the map's own min-height
+  // exceeded the metrics column's natural height - pushing "What to Wear Today" down.
+  const leftColumnRef = useRef(null);
+  const mapColumnRef = useRef(null);
+  useMatchHeight(leftColumnRef, mapColumnRef, "--map-height", [activeLocation]);
 
   return (
     <div className={styles.app}>
@@ -71,7 +79,7 @@ export default function App() {
         ) : (
           <>
           <div className={styles.content}>
-            <div className={styles.leftColumn}>
+            <div className={styles.leftColumn} ref={leftColumnRef}>
               <div className={styles.card}>
                 {loading && !weather ? (
                   <WeatherSkeleton />
@@ -97,7 +105,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className={styles.mapColumn}>
+            <div className={styles.mapColumn} ref={mapColumnRef}>
               {loading && !weather ? (
                 <MapSkeleton />
               ) : weather ? (

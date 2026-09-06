@@ -512,6 +512,54 @@ option that unambiguously satisfies "reloads the dashboard data," though a smoot
 non-reloading refetch is possible later if wanted (would need each data hook to expose
 a manual refetch handle, which none currently do).
 
+## Open-Meteo Archive API: `end_date` must stay behind "today"
+
+`useWeatherOverview.js` requests real daily history from `EARLIEST_YEAR` through
+"today" via the Archive API. Confirmed by direct testing: the Archive API doesn't
+just lag by a day for some locations and gracefully return what it has - it hard
+**rejects the entire request with HTTP 400** ("`end_date` is out of allowed range")
+whenever `end_date` itself is past whatever day the archive has actually finished
+processing, for every location, not a partial response. That's the opposite of what
+an earlier fix here assumed ("request through today, let the per-day finite-value
+filter drop whatever's missing") - the filter never gets a chance to run because the
+whole request fails first. Fix: back `end` off by one day (`end.setDate(end.getDate()
+- 1)`) before requesting, so the request stays inside the API's accepted range; the
+existing finite-value filter still drops anything that lags further than that. This
+is why "Weather overview"/"Climate information"/"Daily summary" can go blank (they all
+read from this hook's `days`) even though nothing was deleted - `useForecastCalendar.js`
+doesn't have this exposure since its historical ranges are always at least a year, or a
+full calendar month, in the past.
+
+## Map column height matches the metrics column exactly (no CSS stretch)
+
+`.content` in `App.module.css` used to be `align-items: stretch`, so the CSS grid
+forced `.leftColumn` (Current Weather + metrics) to grow to match `.mapColumn`'s
+height. Since `.leftColumn` is a flex column with no `justify-content` to redistribute
+extra space, whenever `.mapColumn`'s min-height (420px) exceeded the metrics column's
+real content height, the difference became invisible dead space *inside* `.leftColumn`,
+below the metric cards - pushing "What to Wear Today" down by however much the map
+"needed" to reach its floor, unrelated to the actual 24px section margin. Measured on
+a real render: 46px of hidden slack plus the normal 24px margin, a ~70px gap where a
+28px one was expected. Switching `align-items` alone can't fix this - CSS grid still
+sizes the row to `max(leftColumn's natural height, mapColumn's floor)` regardless of
+`align-items`, so the slack just moves to whichever column is shorter.
+
+Fix: [useMatchHeight.js](weather-app/src/hooks/useMatchHeight.js) - a small
+ResizeObserver hook - measures `.leftColumn`'s real rendered height and writes it as
+`--map-height` on `.mapColumn` (wired up in `App.jsx`), so the map's CSS `height`
+tracks the metrics column exactly (see `App.module.css`'s `.mapColumn`), with
+`min-height: 280px` only as a floor for the instant before the first observer
+callback fires. `.content` is now `align-items: start` so `.leftColumn` is never
+force-stretched. On mobile (≤1024px, stacked layout) `.mapColumn` reverts to
+`height: auto; min-height: 320px` since it's no longer beside the metrics column.
+Gotcha hit while building this: the hook's effect only ran once on mount by default,
+and both refs were still `null` at that point because they live behind an
+`activeLocation &&` conditional render - it needs `activeLocation` in its dependency
+array to retry once the elements actually exist. Also, while testing: this Browser
+pane's hidden/backgrounded state throttles `ResizeObserver` callbacks the same way it
+throttles `requestAnimationFrame` (documented elsewhere in this file for scroll/rAF) -
+`document.hidden` must read `false` before trusting a live measurement from it here.
+
 ## Roadmap ideas (not yet built)
 
 - Optional Google Maps mode behind a `VITE_GOOGLE_MAPS_API_KEY` env var, if Anna decides

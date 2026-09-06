@@ -17,7 +17,12 @@
   display: grid;
   grid-template-columns: 1.4fr 1fr;
   gap: 24px;
-  align-items: stretch;
+  /* start, not stretch - stretch would force .leftColumn to grow to match .mapColumn's
+     height, and since .leftColumn is a flex column that doesn't redistribute stretched
+     space among its children, the extra height became invisible dead space below the
+     metrics grid whenever the map's own min-height exceeded the metrics' real content
+     height - see useMatchHeight, which now sizes the map to match .leftColumn instead. */
+  align-items: start;
 }
 
 .leftColumn {
@@ -41,7 +46,12 @@
 .mapColumn {
   display: flex;
   flex-direction: column;
-  min-height: 420px;
+  /* --map-height is set by useMatchHeight to .leftColumn's real rendered height, so the
+     map always exactly fills the same vertical space the metrics column actually uses -
+     no gap left over on either side. min-height is just a floor for the instant before
+     the first ResizeObserver callback fires. */
+  height: var(--map-height, 420px);
+  min-height: 280px;
 }
 
 .mapColumn > * {
@@ -78,6 +88,9 @@
   }
 
   .mapColumn {
+    /* Stacked layout - the map is no longer beside the metrics column, so it shouldn't
+       borrow its height; fall back to its own natural/floor height instead. */
+    height: auto;
     min-height: 320px;
   }
 }

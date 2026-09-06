@@ -24,10 +24,15 @@ export function useWeatherOverview(location) {
     setState({ days: null, loading: true, error: null });
 
     const start = new Date(EARLIEST_YEAR, 0, 1);
-    const end = new Date(); // request through today - the archive may lag by a day or
-    // two for some locations, but that's already handled below by dropping any day the
-    // API doesn't have a real value for yet, rather than assuming a fixed cutoff and
-    // truncating days it actually does have.
+    // The archive API doesn't just lag on some locations' most recent day - it hard
+    // rejects the ENTIRE request with HTTP 400 if end_date itself is past its actual
+    // processed max (confirmed: requesting end_date=today got "out of allowed range ...
+    // to <yesterday>" for every location, not a partial response). So the finite-value
+    // filter below can only drop stale days that are still within an accepted range -
+    // it can't save us from a request that fails outright. Back off by a day to stay
+    // inside the API's accepted range; the filter still drops anything even that lags.
+    const end = new Date();
+    end.setDate(end.getDate() - 1);
 
     getHistoricalRange(location.latitude, location.longitude, start, end)
       .then((raw) => {
