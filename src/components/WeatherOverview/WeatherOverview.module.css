@@ -3,11 +3,6 @@
 }
 
 .sectionHeader {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
   margin-bottom: 16px;
   max-width: 560px;
 }
@@ -17,23 +12,6 @@
   font-weight: 700;
   color: var(--color-text);
   margin: 0;
-  white-space: nowrap;
-}
-
-.filters {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-@media (max-width: 420px) {
-  .sectionHeader {
-    flex-wrap: wrap;
-  }
-
-  .sectionTitle {
-    white-space: normal;
-  }
 }
 
 .card {
@@ -43,6 +21,14 @@
   padding: 20px;
   max-width: 560px;
   transition: var(--transition-theme);
+}
+
+.cardFilters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
 /* --- Multi-select dropdown --- */

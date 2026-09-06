@@ -42,7 +42,10 @@ export default function WeatherOverviewSection({ days, unit, loading }) {
     <section className={styles.section}>
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>Weather overview</h2>
-        <div className={styles.filters}>
+      </div>
+
+      <div className={styles.card}>
+        <div className={styles.cardFilters}>
           <MultiSelectFilter
             label="Month"
             options={MONTH_OPTIONS}
@@ -56,9 +59,7 @@ export default function WeatherOverviewSection({ days, unit, loading }) {
             onChange={setSelectedYears}
           />
         </div>
-      </div>
 
-      <div className={styles.card}>
         {!stats ? (
           <p className={styles.emptyState}>
             No recorded weather data yet for this selection — it may be entirely in the future.
