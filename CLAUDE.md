@@ -79,6 +79,18 @@ entire UI. Rain/snow render on a single `<canvas>` (not per-particle DOM nodes) 
 (scroll parallax, lightning, wind-driven card jitter were deferred) — see git history
 if extending it further.
 
+## DailyForecast (real 16-day forecast strip)
+
+`src/components/DailyForecast/` (`src/services/dailyForecastService.js`,
+`src/hooks/useDailyForecast.js`) — a horizontal strip showing Open-Meteo's real daily
+forecast out to `forecast_days=16`, the actual physical limit of reliable day-by-day
+weather prediction (verified live). **Note**: Open-Meteo's day 16 consistently returns
+`null` for temperatures (verified via a raw curl check) — this is a real API boundary
+effect, not a bug; `formatTemp`'s existing `--°` fallback handles it gracefully. This
+exists specifically because a genuine forward-looking forecast is NOT possible beyond
+this window — see the "Weather forecast" section below for how that constraint was
+handled for the (much longer) 12-month view.
+
 ## WeatherDetails (13-card detailed dashboard)
 
 `src/components/WeatherDetails/` — the "Weather details" section below the map, one
