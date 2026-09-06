@@ -9,6 +9,13 @@ const DAY_TOP = [70, 158, 224];
 const DAY_BOTTOM = [204, 232, 250];
 const OVERCAST_TOP = [90, 100, 112];
 const OVERCAST_BOTTOM = [150, 158, 168];
+// Rain and snow currently only differed by their particle animation, not sky color -
+// blended in on top of the existing brightness/cloud-cover gradient (not replacing it)
+// so day/night continuity is preserved while giving each mood a distinct tint.
+const RAIN_TOP = [48, 54, 66];
+const RAIN_BOTTOM = [78, 84, 98];
+const SNOW_TOP = [176, 190, 208];
+const SNOW_BOTTOM = [214, 222, 233];
 
 function mix(a, b, t) {
   return a.map((channel, i) => Math.round(channel + (b[i] - channel) * t));
@@ -54,13 +61,26 @@ export default function WeatherAtmosphere({ scene }) {
 
   if (!scene) return null;
 
-  const { brightness, goldenness, dayProgress, nightProgress, isNight, cloudCover, fogIntensity } = scene;
+  const { brightness, goldenness, dayProgress, nightProgress, isNight, cloudCover, fogIntensity, precipitationKind, precipitationIntensity } = scene;
   const isOvercast = cloudCover > 0.7;
 
   const baseTop = mix(NIGHT_TOP, DAY_TOP, brightness);
   const baseBottom = mix(NIGHT_BOTTOM, DAY_BOTTOM, brightness);
-  const top = isOvercast ? mix(baseTop, OVERCAST_TOP, (cloudCover - 0.7) / 0.3) : baseTop;
-  const bottom = isOvercast ? mix(baseBottom, OVERCAST_BOTTOM, (cloudCover - 0.7) / 0.3) : baseBottom;
+  let top = isOvercast ? mix(baseTop, OVERCAST_TOP, (cloudCover - 0.7) / 0.3) : baseTop;
+  let bottom = isOvercast ? mix(baseBottom, OVERCAST_BOTTOM, (cloudCover - 0.7) / 0.3) : baseBottom;
+
+  // Blend toward a mood tint for whatever's actually falling - rain skews the overcast
+  // gradient darker/moodier, snow skews it toward a pale frosted tone. Snow's blend is
+  // also scaled by brightness so a snowy night doesn't get implausibly pale.
+  if (precipitationKind === "rain") {
+    const amount = Math.max(0.25, precipitationIntensity) * 0.7;
+    top = mix(top, RAIN_TOP, amount);
+    bottom = mix(bottom, RAIN_BOTTOM, amount);
+  } else if (precipitationKind === "snow") {
+    const amount = Math.max(0.3, precipitationIntensity) * 0.65 * (0.4 + brightness * 0.6);
+    top = mix(top, SNOW_TOP, amount);
+    bottom = mix(bottom, SNOW_BOTTOM, amount);
+  }
 
   const skyGradient = `linear-gradient(to bottom, ${rgb(top)}, ${rgb(bottom)})`;
   const goldenGlow = goldenness > 0.03 ? `, linear-gradient(to bottom, rgba(255, 150, 90, ${(goldenness * 0.35).toFixed(2)}) 0%, transparent 55%)` : "";

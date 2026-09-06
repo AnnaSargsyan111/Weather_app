@@ -91,6 +91,30 @@ entire UI. Rain/snow render on a single `<canvas>` (not per-particle DOM nodes) 
 (scroll parallax, lightning, wind-driven card jitter were deferred) — see git history
 if extending it further.
 
+The sky gradient blends toward a `RAIN_TOP`/`RAIN_BOTTOM` (moodier/darker) or
+`SNOW_TOP`/`SNOW_BOTTOM` (pale/frosted) tint when `scene.precipitationKind` is "rain"
+or "snow", layered on top of the existing brightness/cloud-cover blend rather than
+replacing it, so day/night continuity is preserved. Before this, rain and snow only
+differed visually via the particle canvas, not the sky color itself. Snow's blend
+amount is additionally scaled by `brightness` so a snowy night doesn't render an
+implausibly pale sky.
+
+A hero-area "frosted glass" look sits on top of this: `--glass-bg`/`--glass-border`/
+`--glass-blur` (in `index.css`, themed for both light/dark) back the current-weather
+card, the Wind/Humidity/Visibility/Pressure stat cards, the Weather overview donut
+card, and the map's border — `background: var(--glass-bg)` +
+`backdrop-filter: blur(var(--glass-blur))` instead of the opaque `--color-surface`
+used everywhere else, so the animated sky shows through, blurred. This is deliberately
+a *separate* token pair from `--color-surface`, not a change to `--color-surface`
+itself — dropdown menus, tooltips, and nested cards elsewhere in the app depend on
+`--color-surface` staying fully opaque. It's also deliberately theme-aware (translucent
+white + dark text in Light, translucent dark + light text in Dark) rather than a single
+hardcoded dark-glass-with-white-text look — the latter would be illegible in Light
+theme against a bright daytime sky. The map's own tile layer is left unblurred (only
+its border uses `--glass-border`) since blurring the actual map content would defeat
+its purpose; sections further down the page (Weather details, Forecast calendar,
+Overview's Climate summary/News) keep the normal opaque `--color-surface` look.
+
 ## WeatherDetails (13-card detailed dashboard)
 
 `src/components/WeatherDetails/` — the "Weather details" section below the map, one
