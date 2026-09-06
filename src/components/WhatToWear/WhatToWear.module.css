@@ -89,7 +89,9 @@
 .insight {
   margin: 14px 0 0;
   font-size: 13px;
-  font-weight: 400;
+  /* Matches .item's weight (600) - same visual emphasis as the "Waterproof jacket"-
+     style labels above it, rather than reading as a lighter, less important line. */
+  font-weight: 600;
   /* --color-text-tertiary read too faint against the glass card - --color-text-secondary
      is the same token CurrentWeather already uses for its own secondary text (location,
      condition label) against this exact background, so contrast is already proven here. */
