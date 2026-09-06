@@ -27,6 +27,11 @@
 .infoSlot {
   display: inline-flex;
   margin-left: auto;
+  /* Pins it to the top of the row instead of centering against the label's full height -
+     matters for a label that wraps to two lines (e.g. "Dew Point"), where centering
+     would land the icon between the two lines rather than next to the first one. */
+  align-self: flex-start;
+  margin-top: 2px;
 }
 
 .icon {

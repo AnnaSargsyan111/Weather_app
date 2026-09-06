@@ -177,11 +177,20 @@ glass cards above. It's pinned to each card's top-right corner via a `margin-lef
 wrapper span in `MetricCard.jsx` (`.infoSlot` in `MetricCard.module.css`) rather than
 baking that positioning into `InfoTooltip` itself, since `InfoTooltip` is meant to be
 layout-agnostic if it's ever reused somewhere that isn't a left-to-right icon+label row.
-**Update**: later brought back down to 14px / opacity 0.6 → 1 (200ms) - the 20px/0.8
-version read as too heavy once seen next to the rest of the UI; the color stayed
+**Update**: brought down to 14px / opacity 0.6 → 1 (200ms) - the 20px/0.8 version read
+as too heavy once seen next to the rest of the UI; the color stayed
 `--color-text-secondary` rather than a hardcoded white, since a fixed white icon would
-be invisible against Light theme's pale glass cards. `MetricCard`'s `.infoSlot`
-positioning is unchanged.
+be invisible against Light theme's pale glass cards. **Update 2**: 14px then turned out
+too small to read - settled on 18px (icon glyph 13px) as the middle ground between the
+two rejected extremes (16px was also tried and still called too small).
+
+`.infoSlot` also gained `align-self: flex-start` (plus a small `margin-top: 2px` nudge) -
+without it, a label that wraps to two lines (e.g. "Dew Point" in the 5-column metrics
+grid, which only fits that in one line when the left hero column is wide enough) had the
+icon vertically centered against the label's *full* two-line height by `.top`'s own
+`align-items: center`, landing it between "Dew" and "Point" rather than next to either.
+`align-self` overrides that for just this one flex item, pinning it to the first line
+regardless of how many lines the label wraps to.
 
 Section titles across `WeatherDetails`/`WeatherForecastCalendar`/`WeatherOverview`/
 `WeatherNews` are now uniformly 18px/700/`var(--color-text)` -
