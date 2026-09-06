@@ -1,5 +1,8 @@
 .section {
-  margin-top: 28px;
+  /* Matches App.module.css's .leftColumn gap exactly - the same spacing already used
+     between the Current Weather card and the metric cards below it - so this section
+     reads as one continuous, evenly-spaced column rather than having its own rhythm. */
+  margin-top: 24px;
 }
 
 /* Mirrors App.module.css's .content grid (1.4fr/1fr, same 1024px collapse breakpoint)
@@ -44,12 +47,15 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* Same card language as the Weather details metric cards right above it (opaque
-   surface, not the hero glass treatment) - this section is a continuation of that
-   grid, not a new visual language. */
+/* Reuses the Current Weather hero card's exact background treatment (App.module.css
+   .card): same glass-bg/blur/border/shadow tokens, so both sit in the same dynamic
+   weather/theme atmosphere instead of reading as two different card languages. */
 .card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-md);
   border-radius: var(--radius-md);
   padding: 20px;
   transition: var(--transition-theme), border-color 0.15s ease;
@@ -84,7 +90,10 @@
   margin: 14px 0 0;
   font-size: 13px;
   font-weight: 400;
-  color: var(--color-text-tertiary);
+  /* --color-text-tertiary read too faint against the glass card - --color-text-secondary
+     is the same token CurrentWeather already uses for its own secondary text (location,
+     condition label) against this exact background, so contrast is already proven here. */
+  color: var(--color-text-secondary);
   line-height: 1.4;
 }
 

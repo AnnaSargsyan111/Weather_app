@@ -286,6 +286,18 @@ card into that same flex column would have made the map stretch taller too. Mirr
 the grid ratio in an independent container gets the exact same width with zero risk to
 the map's height.
 
+`.section`'s `margin-top` is `24px`, matching `App.module.css`'s `.leftColumn` gap
+exactly (the same spacing already used between the Current Weather card and the metric
+cards below it), so the vertical rhythm reads as one continuous column. `.card` uses the
+same glass treatment as the Current Weather hero card (`--glass-bg`/`--glass-border`/
+`--glass-blur`/`--shadow-md`) rather than the opaque `--color-surface` card style used
+further down the page - both those choices came from Anna directly, after an earlier
+version used `--color-surface`/28px, and are captured here rather than in git blame
+alone. `.insight`'s color was bumped from `--color-text-tertiary` to
+`--color-text-secondary` - the same token `CurrentWeather` already uses for its own
+secondary text (location line, condition label) against this identical glass
+background, so contrast here was already proven, not a guess.
+
 ## WeatherDetails (13-card detailed dashboard)
 
 `src/components/WeatherDetails/` — the "Weather details" section below the map, one
