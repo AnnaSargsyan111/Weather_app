@@ -17,6 +17,12 @@ git/npm/CLI/React concepts.
 - Map: **Leaflet + react-leaflet** with OpenStreetMap tiles — free, no API key, no
   billing account required (this is a deliberate choice over Google Maps, which
   requires a Google Cloud billing account even for free-tier usage).
+- Air quality: **Open-Meteo's separate Air Quality API** (`air-quality-api.open-meteo.com`,
+  `src/services/airQualityService.js`) — free, no key.
+- Moon rise/set/phase: **`suncalc`** (npm, `src/services/moonService.js`) — pure
+  astronomical math from lat/lon/date, no API/key at all. Import it as
+  `import * as SunCalc from "suncalc"` (a plain `import SunCalc from "suncalc"` default
+  import broke under Vite's CJS interop the first time this was added).
 - Icons: `react-icons` (`wi` weather-icons set + `pi` Phosphor icons for UI chrome).
 - Persistence: `localStorage` via `src/hooks/useLocalStorage.js` (saved locations,
   theme, temperature unit).
@@ -72,6 +78,22 @@ entire UI. Rain/snow render on a single `<canvas>` (not per-particle DOM nodes) 
 `src/utils/daylight.js`. This was intentionally scoped down from a much larger request
 (scroll parallax, lightning, wind-driven card jitter were deferred) — see git history
 if extending it further.
+
+## WeatherDetails (13-card detailed dashboard)
+
+`src/components/WeatherDetails/` — the "Weather details" section below the map, one
+card per metric (Temperature, Feels Like, Cloud Cover, Precipitation, Wind, Humidity,
+UV, AQI, Visibility, Pressure, Sun, Moon, Moon Phase). `useWeatherDetails.js` is the
+single hook that fetches Open-Meteo hourly data + air quality + suncalc moon data and
+reduces it all into one plain `details` object — every card is a pure function of that
+object (per the user's own ask: one JSON shape driving all 13 cards, so swapping data
+sources later stays easy). Categorization/trend logic (Beaufort scale, UV/AQI/cloud
+labels, peak/trough finding, the "dominant feels-like factor" heuristic) lives in
+`src/utils/weatherDetailsHelpers.js`, kept separate from the fetching hook so each rule
+can be reasoned about independently. All 13 cards share one `WeatherDetails.module.css`
+plus a `DetailCard`/`Badge` shell — deliberately kept on this app's existing CSS Modules
++ react-icons stack rather than the Tailwind/Lucide the original design spec suggested,
+to avoid mixing two styling systems in one small app.
 
 ## Roadmap ideas (not yet built)
 

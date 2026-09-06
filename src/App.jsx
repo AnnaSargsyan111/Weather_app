@@ -6,12 +6,14 @@ import WeatherMap from "./components/WeatherMap/WeatherMap.jsx";
 import ErrorState from "./components/ErrorState/ErrorState.jsx";
 import DismissibleWarning from "./components/ErrorState/DismissibleWarning.jsx";
 import WeatherAtmosphere from "./components/WeatherAtmosphere/WeatherAtmosphere.jsx";
+import WeatherDetailsSection from "./components/WeatherDetails/WeatherDetailsSection.jsx";
 import { WeatherSkeleton, MetricsSkeleton, MapSkeleton } from "./components/LoadingState/LoadingState.jsx";
 import { useSavedLocations } from "./hooks/useSavedLocations.js";
 import { useTheme } from "./hooks/useTheme.js";
 import { useTemperatureUnit } from "./hooks/useTemperatureUnit.js";
 import { useWeather } from "./hooks/useWeather.js";
 import { useAtmosphereScene } from "./hooks/useAtmosphereScene.js";
+import { useWeatherDetails } from "./hooks/useWeatherDetails.js";
 import styles from "./App.module.css";
 
 export default function App() {
@@ -19,6 +21,7 @@ export default function App() {
   const [theme, setTheme] = useTheme();
   const [unit, setUnit] = useTemperatureUnit();
   const { data: weather, loading, error } = useWeather(activeLocation);
+  const { data: details, loading: detailsLoading } = useWeatherDetails(activeLocation, weather);
   const [geoError, setGeoError] = useState(null);
   const scene = useAtmosphereScene(weather);
 
@@ -48,6 +51,7 @@ export default function App() {
             <p className={styles.emptyStateSubtitle}>Search for a city above to see its weather.</p>
           </div>
         ) : (
+          <>
           <div className={styles.content}>
             <div className={styles.leftColumn}>
               <div className={styles.card}>
@@ -81,6 +85,9 @@ export default function App() {
               )}
             </div>
           </div>
+
+          <WeatherDetailsSection details={details} dewPoint={weather?.dewPoint} unit={unit} loading={detailsLoading} />
+          </>
         )}
       </main>
     </div>
