@@ -89,7 +89,8 @@ entire UI. Rain/snow render on a single `<canvas>` (not per-particle DOM nodes) 
 (no fixed-hour cutoffs) recomputed every 60s — see `computeDaylight` in
 `src/utils/daylight.js`. This was intentionally scoped down from a much larger request
 (scroll parallax, lightning, wind-driven card jitter were deferred) — see git history
-if extending it further.
+if extending it further. **Update**: scroll parallax and thunderstorm lightning were
+later added (see below); wind-driven card jitter is still not built.
 
 The sky gradient blends toward a `RAIN_TOP`/`RAIN_BOTTOM` (moodier/darker) or
 `SNOW_TOP`/`SNOW_BOTTOM` (pale/frosted) tint when `scene.precipitationKind` is "rain"
@@ -103,6 +104,46 @@ darkened further (and `PrecipitationCanvas`'s rain particle count roughly double
 changed - with wider opacity/line-width variance per drop for a sense of depth) for a
 more prominent, stormier rain mood; snow's canvas density and sky tint were left as
 they were, since only rain was reported as too subtle.
+
+**Premium atmosphere upgrade** (scroll parallax, lightning, richer sun/moon/clouds):
+- **Sun/moon dimming by cloud cover**: previously the sun/moon's opacity depended only
+  on `brightness` (time of day), so a full-opacity sun rendered even under heavy
+  overcast. Now both are also scaled by a `skyOcclusion` factor derived from
+  `cloudCover` (`1 - min(0.88, cloudCover * 0.92)`) - heavy overcast nearly hides them,
+  while lighter cover during rain naturally reads as a "sun shower" without any
+  special-cased condition for it.
+- **Sun/moon glow**: each is now a `celestialWrap` containing a soft blurred `*Halo`
+  layer behind the disc, with a slow (7-10s) "breathing" scale/opacity animation for a
+  sense of life rather than a static circle. Paused under `prefers-reduced-motion`.
+- **Two cloud layers** (`cloudsFar`/`cloudsNear`, in `WeatherAtmosphere.jsx`) instead of
+  one, for depth - different sizes, speeds, and (via the scroll parallax below)
+  different parallax rates. Cloud color now blends from near-white to slate-grey based
+  on `cloudCover` (previously always the same white/dark-blue regardless of how overcast
+  it actually was), with an irregular `border-radius` per cloud instead of a perfect
+  ellipse.
+- **Richer sunrise/sunset**: the old single warm-orange `goldenGlow` overlay was
+  replaced with a peach → pink → lavender 3-stop band (`DAWN_PEACH`/`DAWN_PINK`/
+  `DAWN_LAVENDER`), still scaled by the existing `goldenness` factor - no changes to the
+  underlying day/night timing math, just the color treatment applied during it.
+- **Thunderstorm lightning**: `scene.precipitationKind === "thunderstorm"` (already a
+  distinct value from `getPrecipitationKind`, just previously unused) schedules a rare
+  (7-22s random gap, never a fixed loop) soft double-flash via a `lightning` state
+  value and a `.lightning` full-screen radial overlay with `mix-blend-mode: screen`.
+  Never fires for plain rain, only genuine thunderstorm conditions.
+- **Scroll parallax**: sun/moon/cloud-layers/stars shift at different rates
+  (0.05/0.035-0.015/0.008 of `scrollY`) via a `--parallax-y` CSS custom property
+  mutated directly through refs in a capture of `window.scrollY` (not React state -
+  scroll fires far too often to re-render on every event) inside an
+  `requestAnimationFrame`-throttled scroll handler. Skipped under
+  `prefers-reduced-motion`; self-disables under a 640px width check that's re-evaluated
+  on **every** tick (not once at mount) - an earlier version checked `innerWidth` only
+  when the effect first ran, which meant a viewport that was momentarily unmeasurable
+  right at mount (e.g. a backgrounded tab) could permanently disable parallax for that
+  entire page load. The atmosphere itself is already `position: fixed` and structurally
+  separate from page content, so none of this ever touches the actual app layout.
+- **Sky transitions**: added `transition: background-image 1.2s ease` to `.sky` for
+  smoother blending when the underlying color target jumps (switching location,
+  weather condition changing) rather than drifting continuously as time passes.
 
 A hero-area "frosted glass" look sits on top of this: `--glass-bg`/`--glass-border`/
 `--glass-blur` (in `index.css`, themed for both light/dark) back the current-weather
