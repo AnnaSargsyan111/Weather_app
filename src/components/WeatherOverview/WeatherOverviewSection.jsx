@@ -9,9 +9,13 @@ const CURRENT_YEAR = new Date().getFullYear();
 const YEAR_OPTIONS = [CURRENT_YEAR - 2, CURRENT_YEAR - 1, CURRENT_YEAR];
 const MONTH_OPTIONS = MONTH_NAMES.map((name, index) => ({ value: index, label: name }));
 const YEAR_SELECT_OPTIONS = YEAR_OPTIONS.map((year) => ({ value: year, label: String(year) }));
+// Default selection on load: January through September only (indices 0-8) - October
+// through December start deselected. Purely the initial state; still fully editable
+// afterward through the same multi-select filters.
+const DEFAULT_MONTHS = MONTH_OPTIONS.slice(0, 9).map((m) => m.value);
 
 export default function WeatherOverviewSection({ days, unit, loading }) {
-  const [selectedMonths, setSelectedMonths] = useState(MONTH_OPTIONS.map((m) => m.value));
+  const [selectedMonths, setSelectedMonths] = useState(DEFAULT_MONTHS);
   const [selectedYears, setSelectedYears] = useState([CURRENT_YEAR]);
 
   const stats = useMemo(() => {
