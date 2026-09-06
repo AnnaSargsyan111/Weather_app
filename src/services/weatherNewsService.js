@@ -5,8 +5,8 @@
 const RSS2JSON_URL = "https://api.rss2json.com/v1/api.json?rss_url=";
 
 const FEEDS = [
-  { url: "https://www.theguardian.com/environment/climate-crisis/rss", category: "Global Warming" },
-  { url: "http://feeds.bbci.co.uk/news/science_and_environment/rss.xml", category: "Climate Change" },
+  "https://www.theguardian.com/environment/climate-crisis/rss",
+  "http://feeds.bbci.co.uk/news/science_and_environment/rss.xml",
 ];
 
 const MAX_ARTICLES = 6;
@@ -48,8 +48,8 @@ function sourceName(link) {
   }
 }
 
-async function fetchFeed(feed) {
-  const response = await fetch(RSS2JSON_URL + encodeURIComponent(feed.url));
+async function fetchFeed(feedUrl) {
+  const response = await fetch(RSS2JSON_URL + encodeURIComponent(feedUrl));
   if (!response.ok) throw new Error("Feed unavailable");
   const data = await response.json();
   if (data.status !== "ok") throw new Error("Feed unavailable");
@@ -67,7 +67,6 @@ async function fetchFeed(feed) {
     source: sourceName(item.link),
     publishedAt: item.pubDate,
     thumbnail: decodeEntities(item.thumbnail || item.enclosure?.link || null),
-    category: feed.category,
   }));
 }
 

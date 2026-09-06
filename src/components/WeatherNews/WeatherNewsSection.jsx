@@ -1,14 +1,12 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { PiThumbsUpBold, PiThumbsUpFill, PiThumbsDownBold, PiThumbsDownFill, PiArrowSquareOutBold, PiGlobeBold } from "react-icons/pi";
 import { useWeatherNews } from "../../hooks/useWeatherNews.js";
 import { formatRelativeTime } from "../../utils/relativeTime.js";
 import styles from "./WeatherNews.module.css";
 
-const CATEGORIES = ["All News", "Global Warming", "Climate Change"];
-
 function NewsCard({ article, reaction, onVote }) {
   return (
-    <div className={styles.card}>
+    <div className={styles.newsCard}>
       <a href={article.link} target="_blank" rel="noopener noreferrer" className={styles.thumbnailLink}>
         {article.thumbnail ? (
           <img src={article.thumbnail} alt="" className={styles.thumbnail} loading="lazy" />
@@ -64,14 +62,7 @@ function NewsCard({ article, reaction, onVote }) {
 }
 
 export default function WeatherNewsSection({ loading, articles, error }) {
-  const [activeCategory, setActiveCategory] = useState("All News");
   const [reactions, setReactions] = useState({});
-
-  const filtered = useMemo(() => {
-    if (!articles) return [];
-    if (activeCategory === "All News") return articles;
-    return articles.filter((a) => a.category === activeCategory);
-  }, [articles, activeCategory]);
 
   function handleVote(id, choice) {
     setReactions((prev) => {
@@ -92,33 +83,20 @@ export default function WeatherNewsSection({ loading, articles, error }) {
   }
 
   return (
-    <div className={styles.card}>
-      <div className={styles.header}>
-        <h2 className={styles.title}>Weather news</h2>
-        <div className={styles.filters}>
-          {CATEGORIES.map((category) => (
-            <button
-              key={category}
-              type="button"
-              className={`${styles.filterButton} ${activeCategory === category ? styles.filterButtonActive : ""}`}
-              aria-pressed={activeCategory === category}
-              onClick={() => setActiveCategory(category)}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
+    <section className={styles.section}>
+      <div className={styles.sectionHeader}>
+        <h2 className={styles.sectionTitle}>Weather news</h2>
       </div>
 
       {loading && !articles ? (
         <p className={styles.statusText}>Loading news…</p>
       ) : error ? (
         <p className={styles.statusText}>{error}</p>
-      ) : filtered.length === 0 ? (
-        <p className={styles.statusText}>No articles in this category right now.</p>
+      ) : articles.length === 0 ? (
+        <p className={styles.statusText}>No news available right now.</p>
       ) : (
         <div className={styles.grid}>
-          {filtered.map((article) => (
+          {articles.map((article) => (
             <NewsCard
               key={article.id}
               article={article}
@@ -128,6 +106,6 @@ export default function WeatherNewsSection({ loading, articles, error }) {
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 }

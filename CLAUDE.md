@@ -194,25 +194,30 @@ the API, displayed in cm — divide by 10), and wind. Both cards stack to one co
 
 ## WeatherNews (real climate headlines, not mock data)
 
-`src/components/WeatherNews/` — a "Weather news" card rendered below ClimateSummary. A
-spec for this asked for hardcoded headlines under real bylines (NASA, NOAA, Reuters,
-Kathmandu Post, etc.) - that's fabricated journalism attributed to real organizations,
-a harder line than "don't mock weather data," so it was declined outright. Built instead
-on genuinely live headlines:
+`src/components/WeatherNews/` — a "Weather news" section rendered below ClimateSummary,
+structured like WeatherDetails/WeatherForecastCalendar: a plain, borderless
+`section`/`sectionHeader`/`sectionTitle` above the content, not a title packed inside a
+bordered card - the section title should always sit outside the card "skeleton", not
+inside it, matching every other section in this app. A spec for this asked for hardcoded
+headlines under real bylines (NASA, NOAA, Reuters, Kathmandu Post, etc.) - that's
+fabricated journalism attributed to real organizations, a harder line than "don't mock
+weather data," so it was declined outright. Built instead on genuinely live headlines:
 
 `src/services/weatherNewsService.js` pulls real RSS feeds from The Guardian
-(`environment/climate-crisis`, tagged "Global Warming") and BBC News
-(`science_and_environment`, tagged "Climate Change") through `api.rss2json.com` - a
-free, keyless RSS->JSON proxy, needed because browsers can't fetch cross-origin XML and
-neither publisher sends CORS headers. `Promise.allSettled` keeps whichever feed(s)
-succeed (the free rss2json tier can be rate-limited) and only throws if both fail.
-`isClimateRelevant` re-filters every item by keyword match **on the title only** (not
-the body) before it's shown, since both feeds carry loosely-tagged items (general
-politics op-eds, archaeology, wildlife policy) that aren't actually about climate/
-warming, and a keyword appearing anywhere in the body text (e.g. "political climate")
-produced false positives when body text was included. Results are capped to the 6 most
-recent qualifying articles (`MAX_ARTICLES`). `decodeEntities` un-escapes `&amp;` etc. in
-titles/thumbnail URLs - rss2json passes some fields through still HTML-entity-escaped,
+(`environment/climate-crisis`) and BBC News (`science_and_environment`) through
+`api.rss2json.com` - a free, keyless RSS->JSON proxy, needed because browsers can't
+fetch cross-origin XML and neither publisher sends CORS headers. `Promise.allSettled`
+keeps whichever feed(s) succeed (the free rss2json tier can be rate-limited) and only
+throws if both fail. `isClimateRelevant` filters every item by keyword match **on the
+title only** (not the body) before it's shown, since both feeds carry loosely-tagged
+items (general politics op-eds, archaeology, wildlife policy) that aren't actually about
+climate/warming, and a keyword appearing anywhere in the body text (e.g. "political
+climate") produced false positives when body text was included. Results are capped to
+the 6 most recent qualifying articles (`MAX_ARTICLES`). There is deliberately no category
+filter UI (an earlier version had All News/Global Warming/Climate Change tabs - removed
+per Anna's request; the service still only sources from climate-focused feeds, so
+narrowing was never load-bearing on the tabs). `decodeEntities` un-escapes `&amp;` etc.
+in titles/thumbnail URLs - rss2json passes some fields through still HTML-entity-escaped,
 which silently breaks an image `src` if left as-is (literal `&amp;` isn't a valid query
 separator). Like/dislike counts are pure local UI state seeded at 0, not real published
 metrics presented as fact - clicking is a genuine mutually-exclusive single-vote toggle,
