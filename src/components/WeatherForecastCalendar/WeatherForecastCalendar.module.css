@@ -23,13 +23,10 @@
 }
 
 .title {
-  font-size: 22px;
-  font-weight: 800;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
   margin: 0;
-  background: linear-gradient(to right, var(--color-text), var(--color-text-secondary));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
 }
 
 .filters {

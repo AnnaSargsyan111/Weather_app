@@ -21,6 +21,49 @@
   background: var(--color-accent-soft);
 }
 
+/* Day/night accent for the active tab, based on that city's own real is_day flag
+   rather than the manual Light/Dark theme toggle. Each has its own dark-theme
+   override since a light sky-blue tint needs dark text on a light surface but light
+   text once the surrounding chip surface itself goes dark. */
+.chipActiveDay {
+  border-color: rgba(56, 189, 248, 0.85);
+  background: rgba(14, 165, 233, 0.15);
+  color: #0c4a6e;
+}
+
+.chipActiveDay .temp {
+  color: rgba(12, 74, 110, 0.75);
+}
+
+:global([data-theme="dark"]) .chipActiveDay {
+  background: rgba(56, 189, 248, 0.18);
+  color: #bae6fd;
+}
+
+:global([data-theme="dark"]) .chipActiveDay .temp {
+  color: rgba(186, 230, 253, 0.75);
+}
+
+.chipActiveNight {
+  border-color: rgba(129, 140, 248, 0.55);
+  background: rgba(49, 46, 129, 0.16);
+  color: #312e81;
+}
+
+.chipActiveNight .temp {
+  color: rgba(49, 46, 129, 0.75);
+}
+
+:global([data-theme="dark"]) .chipActiveNight {
+  border-color: rgba(129, 140, 248, 0.4);
+  background: rgba(49, 46, 129, 0.4);
+  color: #e0e7ff;
+}
+
+:global([data-theme="dark"]) .chipActiveNight .temp {
+  color: rgba(224, 231, 255, 0.75);
+}
+
 .button {
   display: flex;
   align-items: center;

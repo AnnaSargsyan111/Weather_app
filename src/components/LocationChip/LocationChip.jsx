@@ -9,8 +9,20 @@ export default function LocationChip({ location, isActive, unit, onSelect, onRem
   const { data } = useWeather(location);
   const condition = data ? getWeatherCondition(data.weatherCode, data.isDay) : null;
 
+  // The active tab's accent reflects that city's own real day/night state (from the
+  // same live `is_day` flag the weather icon already uses), not the manual Light/Dark
+  // theme toggle - a location can be in daylight while the user has Dark theme on, or
+  // vice versa. Falls back to the plain neutral accent until its own data has loaded.
+  const activeMoodClass = !isActive
+    ? ""
+    : data
+    ? data.isDay
+      ? styles.chipActiveDay
+      : styles.chipActiveNight
+    : styles.chipActive;
+
   return (
-    <div className={`${styles.chip} ${isActive ? styles.chipActive : ""}`}>
+    <div className={`${styles.chip} ${activeMoodClass}`}>
       <button
         type="button"
         className={styles.button}

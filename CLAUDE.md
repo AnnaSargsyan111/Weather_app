@@ -168,6 +168,39 @@ glass cards above. It's pinned to each card's top-right corner via a `margin-lef
 wrapper span in `MetricCard.jsx` (`.infoSlot` in `MetricCard.module.css`) rather than
 baking that positioning into `InfoTooltip` itself, since `InfoTooltip` is meant to be
 layout-agnostic if it's ever reused somewhere that isn't a left-to-right icon+label row.
+**Update**: later brought back down to 14px / opacity 0.6 → 1 (200ms) - the 20px/0.8
+version read as too heavy once seen next to the rest of the UI; the color stayed
+`--color-text-secondary` rather than a hardcoded white, since a fixed white icon would
+be invisible against Light theme's pale glass cards. `MetricCard`'s `.infoSlot`
+positioning is unchanged.
+
+Section titles across `WeatherDetails`/`WeatherForecastCalendar`/`WeatherOverview`/
+`WeatherNews` are now uniformly 18px/700/`var(--color-text)` -
+`WeatherForecastCalendarSection`'s `.title` used to be a distinct 22px/800 gradient-clip
+treatment (`background-clip: text`) left over from before the other three sections
+adopted the plain-title convention; it was brought in line rather than the other way
+around, since 3 of 4 already matched.
+
+The active tab's accent (`LocationChip.jsx`/`.module.css`) now reflects that specific
+city's own real day/night state (`data.isDay`, the same live Open-Meteo `is_day` flag
+its weather icon already uses) rather than the manual Light/Dark theme toggle - a city
+can be in daylight while the user has Dark theme on, or vice versa, so tying this to the
+theme toggle would have been the wrong axis. `.chipActiveDay` (sky-blue) and
+`.chipActiveNight` (indigo) each carry their own `[data-theme="dark"]` override, since
+e.g. a light sky-blue tint needs dark text on a light chip surface but light text once
+the surrounding surface itself goes dark - four total combinations, not two. Falls back
+to the old neutral `.chipActive` (plain accent color) only for the brief moment before
+that chip's own `useWeather` call resolves. The Header's own background switched from
+opaque `--color-bg-elevated` to the shared `--glass-bg`/`--glass-border`/`--glass-blur`
+tokens, matching the hero cards below it.
+
+Verification note: `getComputedStyle` returned stale/incorrect values for the chip
+accent colors in this session's testing (reporting the old orange `--color-accent`
+values on an element whose class list and `.matches()` results both proved only the new
+rule could apply) while a real screenshot showed the correct sky-blue/indigo rendering -
+consistent with this session's broader pattern of the automated browser pane's paint
+pipeline being unreliable while reported as hidden/backgrounded. Trust a screenshot or
+`.matches()` over `getComputedStyle` if this resurfaces.
 
 ## WeatherDetails (13-card detailed dashboard)
 

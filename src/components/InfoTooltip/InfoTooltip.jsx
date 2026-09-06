@@ -75,7 +75,7 @@ export default function InfoTooltip({ label, description }) {
           show();
         }}
       >
-        <PiInfoBold size={14} aria-hidden="true" />
+        <PiInfoBold size={11} aria-hidden="true" />
       </button>
       {open &&
         position &&
