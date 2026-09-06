@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 
-const MAX_PARTICLES = 220;
+const MAX_RAIN_PARTICLES = 420;
+const MAX_SNOW_PARTICLES = 220;
 
 // Lightweight canvas particle system for rain/snow - avoids hundreds of DOM nodes.
 // Pauses itself when the tab is hidden or reduced-motion is requested.
@@ -28,27 +29,34 @@ export default function PrecipitationCanvas({ kind, intensity, windLean, reduced
 
     function spawnParticle() {
       const isSnow = configRef.current.kind === "snow";
+      // Rain particles vary more in size/speed/opacity than before so nearer (bigger,
+      // faster, more opaque) and farther (thinner, slower, fainter) drops read as real
+      // depth rather than a uniform curtain.
+      const depth = Math.random();
       return {
         x: Math.random() * width,
         y: -20,
-        length: isSnow ? 0 : 10 + Math.random() * 16,
+        length: isSnow ? 0 : 14 + depth * 22,
         radius: isSnow ? 1.5 + Math.random() * 2.5 : 0,
-        speed: isSnow ? 0.6 + Math.random() * 1 : 5 + Math.random() * 5,
+        lineWidth: isSnow ? 0 : 0.8 + depth * 1.6,
+        speed: isSnow ? 0.6 + Math.random() * 1 : 7 + depth * 7,
         drift: isSnow ? (Math.random() - 0.5) * 0.6 : 0,
-        opacity: isSnow ? 0.5 + Math.random() * 0.4 : 0.25 + Math.random() * 0.35,
+        opacity: isSnow ? 0.5 + Math.random() * 0.4 : 0.35 + depth * 0.45,
       };
     }
 
     function step() {
       const { kind: currentKind, intensity: currentIntensity, windLean: currentLean } = configRef.current;
-      const targetCount = Math.round(MAX_PARTICLES * currentIntensity);
+      const isSnowKind = currentKind === "snow";
+      const maxParticles = isSnowKind ? MAX_SNOW_PARTICLES : MAX_RAIN_PARTICLES;
+      const targetCount = Math.round(maxParticles * currentIntensity);
       const particles = particlesRef.current;
 
       while (particles.length < targetCount) particles.push(spawnParticle());
       if (particles.length > targetCount) particles.length = targetCount;
 
       ctx.clearRect(0, 0, width, height);
-      ctx.strokeStyle = "rgba(200, 215, 235, 0.55)";
+      ctx.strokeStyle = "rgba(210, 224, 240, 0.85)";
       ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
 
       const isSnow = currentKind === "snow";
@@ -67,7 +75,7 @@ export default function PrecipitationCanvas({ kind, intensity, windLean, reduced
           p.x += currentLean * (p.speed / 5);
           p.y += p.speed;
           ctx.globalAlpha = p.opacity;
-          ctx.lineWidth = 1;
+          ctx.lineWidth = p.lineWidth;
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(p.x + dx, p.y + p.length);

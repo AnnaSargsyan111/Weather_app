@@ -7,7 +7,11 @@ export default function MetricCard({ icon: Icon, label, value, unit, context, de
       <div className={styles.top}>
         <Icon size={18} className={styles.icon} aria-hidden="true" />
         <span className={styles.label}>{label}</span>
-        {description && <InfoTooltip label={label} description={description} />}
+        {description && (
+          <span className={styles.infoSlot}>
+            <InfoTooltip label={label} description={description} />
+          </span>
+        )}
       </div>
       <div>
         <span className={styles.value}>{value}</span>

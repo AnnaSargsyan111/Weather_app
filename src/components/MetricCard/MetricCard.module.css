@@ -24,6 +24,11 @@
   color: var(--color-text-secondary);
 }
 
+.infoSlot {
+  display: inline-flex;
+  margin-left: auto;
+}
+
 .icon {
   color: var(--color-accent);
 }

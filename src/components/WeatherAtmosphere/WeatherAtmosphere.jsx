@@ -12,8 +12,8 @@ const OVERCAST_BOTTOM = [150, 158, 168];
 // Rain and snow currently only differed by their particle animation, not sky color -
 // blended in on top of the existing brightness/cloud-cover gradient (not replacing it)
 // so day/night continuity is preserved while giving each mood a distinct tint.
-const RAIN_TOP = [48, 54, 66];
-const RAIN_BOTTOM = [78, 84, 98];
+const RAIN_TOP = [30, 34, 44];
+const RAIN_BOTTOM = [56, 61, 74];
 const SNOW_TOP = [176, 190, 208];
 const SNOW_BOTTOM = [214, 222, 233];
 
@@ -73,7 +73,7 @@ export default function WeatherAtmosphere({ scene }) {
   // gradient darker/moodier, snow skews it toward a pale frosted tone. Snow's blend is
   // also scaled by brightness so a snowy night doesn't get implausibly pale.
   if (precipitationKind === "rain") {
-    const amount = Math.max(0.25, precipitationIntensity) * 0.7;
+    const amount = Math.max(0.4, precipitationIntensity) * 0.85;
     top = mix(top, RAIN_TOP, amount);
     bottom = mix(bottom, RAIN_BOTTOM, amount);
   } else if (precipitationKind === "snow") {

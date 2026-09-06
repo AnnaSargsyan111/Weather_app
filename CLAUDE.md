@@ -97,7 +97,12 @@ or "snow", layered on top of the existing brightness/cloud-cover blend rather th
 replacing it, so day/night continuity is preserved. Before this, rain and snow only
 differed visually via the particle canvas, not the sky color itself. Snow's blend
 amount is additionally scaled by `brightness` so a snowy night doesn't render an
-implausibly pale sky.
+implausibly pale sky. The `RAIN_TOP`/`RAIN_BOTTOM` tint and blend ceiling were later
+darkened further (and `PrecipitationCanvas`'s rain particle count roughly doubled -
+`MAX_RAIN_PARTICLES`, kept separate from `MAX_SNOW_PARTICLES` so snow density wasn't
+changed - with wider opacity/line-width variance per drop for a sense of depth) for a
+more prominent, stormier rain mood; snow's canvas density and sky tint were left as
+they were, since only rain was reported as too subtle.
 
 A hero-area "frosted glass" look sits on top of this: `--glass-bg`/`--glass-border`/
 `--glass-blur` (in `index.css`, themed for both light/dark) back the current-weather
@@ -114,6 +119,14 @@ theme against a bright daytime sky. The map's own tile layer is left unblurred (
 its border uses `--glass-border`) since blurring the actual map content would defeat
 its purpose; sections further down the page (Weather details, Forecast calendar,
 Overview's Climate summary/News) keep the normal opaque `--color-surface` look.
+
+`InfoTooltip`'s trigger (the small "i" circle used by `MetricCard` on the stat cards)
+was bumped from 16px/`--color-text-tertiary` to 20px/`--color-text-secondary` with an
+explicit `opacity: 0.8` → `1` on hover, since it read as nearly invisible against the
+glass cards above. It's pinned to each card's top-right corner via a `margin-left: auto`
+wrapper span in `MetricCard.jsx` (`.infoSlot` in `MetricCard.module.css`) rather than
+baking that positioning into `InfoTooltip` itself, since `InfoTooltip` is meant to be
+layout-agnostic if it's ever reused somewhere that isn't a left-to-right icon+label row.
 
 ## WeatherDetails (13-card detailed dashboard)
 
