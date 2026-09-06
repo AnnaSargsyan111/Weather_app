@@ -46,3 +46,23 @@
   color: var(--color-text-secondary);
   white-space: nowrap;
 }
+
+.removeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-left: 2px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.removeButton:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}

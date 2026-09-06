@@ -1,8 +1,8 @@
+import { PiXBold } from "react-icons/pi";
 import { useWeather } from "../../hooks/useWeather.js";
 import { getWeatherCondition } from "../../services/weatherCodes.js";
 import { formatTemp } from "../../utils/temperature.js";
 import WeatherIcon from "../WeatherIcon/WeatherIcon.jsx";
-import LocationMenu from "../LocationMenu/LocationMenu.jsx";
 import styles from "./LocationChip.module.css";
 
 export default function LocationChip({ location, isActive, unit, onSelect, onRemove }) {
@@ -25,7 +25,17 @@ export default function LocationChip({ location, isActive, unit, onSelect, onRem
         <span className={styles.name}>{location.name}</span>
         {data && <span className={styles.temp}>{formatTemp(data.temperature, unit)}</span>}
       </button>
-      <LocationMenu label={location.name} onRemove={onRemove} />
+      <button
+        type="button"
+        className={styles.removeButton}
+        aria-label={`Remove ${location.name}`}
+        onClick={(event) => {
+          event.stopPropagation();
+          onRemove();
+        }}
+      >
+        <PiXBold size={13} aria-hidden="true" />
+      </button>
     </div>
   );
 }

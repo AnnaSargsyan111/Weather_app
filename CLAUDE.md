@@ -32,9 +32,10 @@ this file if needed) — never hardcode a key into source.
 ## Architecture
 
 - `src/components/*` — one folder per UI piece: `Header`, `LocationSearch`,
-  `LocationSuggestions`, `CurrentLocationButton`, `LocationChip`, `LocationMenu`,
-  `ThemeSelector`, `TemperatureUnitSelector`, `CurrentWeather`, `WeatherIcon`,
-  `WeatherMetrics` + `MetricCard`, `WeatherMap`, `LoadingState`, `ErrorState`,
+  `LocationSuggestions`, `CurrentLocationButton`, `LocationChip` (its own X button
+  removes it directly - no submenu), `ThemeSelector`, `TemperatureUnitSelector`,
+  `ClimateLink` (the IPCC link next to the unit selector), `CurrentWeather`,
+  `WeatherIcon`, `WeatherMetrics` + `MetricCard`, `WeatherMap`, `LoadingState`, `ErrorState`,
   `InfoTooltip` (portal-rendered metric explanations), `WeatherAtmosphere` (the
   time/weather-driven background scene — sky, sun/moon, stars, clouds, fog,
   canvas-based rain/snow particles).

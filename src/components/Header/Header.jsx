@@ -3,6 +3,7 @@ import CurrentLocationButton from "../CurrentLocationButton/CurrentLocationButto
 import LocationChip from "../LocationChip/LocationChip.jsx";
 import ThemeSelector from "../ThemeSelector/ThemeSelector.jsx";
 import TemperatureUnitSelector from "../TemperatureUnitSelector/TemperatureUnitSelector.jsx";
+import ClimateLink from "../ClimateLink/ClimateLink.jsx";
 import styles from "./Header.module.css";
 
 export default function Header({
@@ -41,6 +42,7 @@ export default function Header({
       <div className={styles.right}>
         <ThemeSelector theme={theme} onChange={onThemeChange} />
         <TemperatureUnitSelector unit={unit} onChange={onUnitChange} />
+        <ClimateLink />
       </div>
     </header>
   );
