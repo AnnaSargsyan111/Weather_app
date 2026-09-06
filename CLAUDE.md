@@ -158,6 +158,16 @@ nothing:
   sentence — both were rejected in favor of this real-data-first approach so nothing in
   the UI is ever presented as a guaranteed forecast when it isn't one.
 
+`DayHoverCard` is `position: fixed` with coordinates computed once (from
+`getBoundingClientRect()` in `ForecastDayCell.jsx`'s `show()`), so without a scroll
+handler it visually detached from its cell the moment the page scrolled while it was
+open. Fixed by closing it on scroll (a capture-phase `window.addEventListener("scroll",
+..., true)` in `ForecastDayCell.jsx`, added when `position` is set and removed when it
+isn't) rather than continuously recomputing its position - simpler, and reasonable for
+what's meant to be a brief hover preview rather than something read while scrolling.
+`InfoTooltip` already had the equivalent listener (it recomputes position on scroll
+instead of closing) and didn't need this fix.
+
 **Known gotcha, fixed once already**: date math here MUST use local-date components
 (`getFullYear()`/`getMonth()`/`getDate()`), never `date.toISOString().slice(0,10)` —
 `toISOString()` converts to UTC first, which silently shifts the date backward by one

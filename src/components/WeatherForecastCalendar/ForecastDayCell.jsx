@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import WeatherIcon from "../WeatherIcon/WeatherIcon.jsx";
 import DayHoverCard from "./DayHoverCard.jsx";
 import { formatTemp } from "../../utils/temperature.js";
@@ -19,6 +19,20 @@ export default function ForecastDayCell({ day, unit, matchesFilter, isToday, isA
   function hide() {
     setPosition(null);
   }
+
+  // The hover card is `position: fixed` and portaled to <body>, so its coordinates are
+  // only ever correct at the instant `show()` computed them - scrolling moves the cell
+  // out from under it without moving the card, leaving it visually detached. Simplest
+  // correct fix: close it the moment a scroll happens, rather than continuously
+  // recomputing a position for what's meant to be a brief hover preview.
+  useEffect(() => {
+    if (!position) return;
+    function handleScroll() {
+      setPosition(null);
+    }
+    window.addEventListener("scroll", handleScroll, true);
+    return () => window.removeEventListener("scroll", handleScroll, true);
+  }, [position]);
 
   const classNames = [
     styles.cell,
