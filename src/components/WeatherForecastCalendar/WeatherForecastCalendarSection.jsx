@@ -10,7 +10,7 @@ const FILTERS = [
   { key: "hot", label: "Extreme Heat" },
 ];
 
-export default function WeatherForecastCalendarSection({ months, unit, loading }) {
+export default function WeatherForecastCalendarSection({ months, leadingPaddingDays, unit, loading }) {
   const [activeKey, setActiveKey] = useState(null);
   const [filter, setFilter] = useState("all");
 
@@ -33,7 +33,12 @@ export default function WeatherForecastCalendarSection({ months, unit, loading }
 
   const activeIndex = months.findIndex((m) => m.key === activeKey);
   const activeMonth = activeIndex >= 0 ? months[activeIndex] : months[0];
-  const previousMonth = activeIndex > 0 ? months[activeIndex - 1] : null;
+  const previousMonth =
+    activeIndex > 0
+      ? months[activeIndex - 1]
+      : leadingPaddingDays && leadingPaddingDays.length > 0
+      ? { days: leadingPaddingDays }
+      : null;
   const nextMonth = activeIndex >= 0 && activeIndex < months.length - 1 ? months[activeIndex + 1] : null;
 
   return (

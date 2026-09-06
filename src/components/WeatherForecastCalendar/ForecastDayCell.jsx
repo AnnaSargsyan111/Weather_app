@@ -50,7 +50,6 @@ export default function ForecastDayCell({ day, unit, matchesFilter, isToday, isA
         <span className={styles.cellMax}>{formatTemp(day.tempMax, unit)}</span>
         <span className={styles.cellMin}>{formatTemp(day.tempMin, unit)}</span>
       </div>
-      {!isAdjacent && day.source === "estimated" && <span className={styles.estimatedBadge}>Estimated</span>}
       {!isAdjacent && <DayHoverCard day={day} position={position} unit={unit} />}
     </div>
   );

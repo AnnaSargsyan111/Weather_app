@@ -24,7 +24,7 @@ export default function App() {
   const [unit, setUnit] = useTemperatureUnit();
   const { data: weather, loading, error } = useWeather(activeLocation);
   const { data: details, loading: detailsLoading } = useWeatherDetails(activeLocation, weather);
-  const { months, loading: monthsLoading } = useForecastCalendar(activeLocation);
+  const { months, leadingPaddingDays, loading: monthsLoading } = useForecastCalendar(activeLocation);
   const [geoError, setGeoError] = useState(null);
   const scene = useAtmosphereScene(weather);
 
@@ -90,7 +90,12 @@ export default function App() {
           </div>
 
           <WeatherDetailsSection details={details} dewPoint={weather?.dewPoint} unit={unit} loading={detailsLoading} />
-          <WeatherForecastCalendarSection months={months} unit={unit} loading={monthsLoading} />
+          <WeatherForecastCalendarSection
+            months={months}
+            leadingPaddingDays={leadingPaddingDays}
+            unit={unit}
+            loading={monthsLoading}
+          />
           </>
         )}
       </main>

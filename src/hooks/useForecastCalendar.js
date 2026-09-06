@@ -55,17 +55,46 @@ export function useForecastCalendar(location) {
     const startBaseline = new Date(startTarget.getFullYear() - 1, startTarget.getMonth(), 1);
     const endBaseline = new Date(startTarget.getFullYear() - 1, startTarget.getMonth() + 12, 0);
 
+    // The month immediately before the 12-month range (e.g. Aug 2026 when the range
+    // starts Sep 2026) isn't otherwise fetched anywhere, so the first month's leading
+    // calendar-padding days would have no real data to show. It's already in the past
+    // by the time this range starts, so fetch its own real (not year-shifted) history -
+    // just the last week is enough to cover any leading-padding need (max 6 days).
+    const paddingRangeEnd = new Date(startTarget.getTime() - 24 * 60 * 60 * 1000);
+    const paddingRangeStart = new Date(paddingRangeEnd.getTime() - 6 * 24 * 60 * 60 * 1000);
+
     Promise.all([
       getDailyForecast(location.latitude, location.longitude),
       getHistoricalRange(location.latitude, location.longitude, startBaseline, endBaseline),
+      getHistoricalRange(location.latitude, location.longitude, paddingRangeStart, paddingRangeEnd),
     ])
-      .then(([real, baseline]) => {
+      .then(([real, baseline, leadingPaddingRaw]) => {
         if (cancelled) return;
 
         const realByDate = new Map();
         real.forEach((d) => {
           if (Number.isFinite(d.tempMax)) realByDate.set(d.date, d);
         });
+
+        const leadingPaddingDays = leadingPaddingRaw.time
+          .map((dateStr, i) => {
+            if (!Number.isFinite(leadingPaddingRaw.tempMax[i])) return null;
+            const d = parseLocalDate(dateStr);
+            return {
+              date: dateStr,
+              day: d.getDate(),
+              weekday: d.getDay(),
+              tempMax: leadingPaddingRaw.tempMax[i],
+              tempMin: leadingPaddingRaw.tempMin[i],
+              precipitation: leadingPaddingRaw.precipitation[i],
+              precipitationProbability: leadingPaddingRaw.precipitation[i] > 1 ? 55 : 5,
+              windSpeed: leadingPaddingRaw.windSpeed[i],
+              condition: getWeatherCondition(leadingPaddingRaw.weatherCode[i], true),
+              isRainy: leadingPaddingRaw.precipitation[i] > 1,
+              source: "live",
+            };
+          })
+          .filter(Boolean);
 
         const baselineByMonthDay = new Map();
         baseline.time.forEach((dateStr, i) => {
@@ -163,7 +192,7 @@ export function useForecastCalendar(location) {
           });
         }
 
-        setState({ months, loading: false, error: null });
+        setState({ months, leadingPaddingDays, loading: false, error: null });
       })
       .catch((error) => {
         if (!cancelled) setState({ months: null, loading: false, error: error.message });
