@@ -16,7 +16,19 @@ git/npm/CLI/React concepts.
   policy (light/personal use only, no bulk/automated requests).
 - Map: **Leaflet + react-leaflet** with OpenStreetMap tiles — free, no API key, no
   billing account required (this is a deliberate choice over Google Maps, which
-  requires a Google Cloud billing account even for free-tier usage).
+  requires a Google Cloud billing account even for free-tier usage). `WeatherMap.jsx`
+  defaults to `zoom={13}` and `flyTo`s (not `setView`) on location change for a smooth
+  animated recenter. Clicking anywhere on the map opens Google Maps to the same
+  coordinates in a new tab (`window.open` to a plain `google.com/maps/@lat,lon,zoom`
+  URL — this is just a link, not the Maps JavaScript API, so it needs no key/billing).
+  That click is wired via react-leaflet's `useMapEvent("click", ...)`, not a plain DOM
+  `onClick` on the wrapper - Leaflet stops event propagation for its own zoom-control
+  and attribution-link clicks internally, so listening on Leaflet's own click event
+  (rather than the wrapper div) is what keeps those controls from also triggering the
+  external-open handler. The external-link icon in the top-right corner is
+  opacity-revealed on `.wrapper:hover`/`:focus-within` (same pattern as the tooltips in
+  `ClimateLink`/`CurrentLocationButton`) but forced visible via `@media (hover: none)`
+  for touch devices, which can't hover to reveal it.
 - Air quality: **Open-Meteo's separate Air Quality API** (`air-quality-api.open-meteo.com`,
   `src/services/airQualityService.js`) — free, no key.
 - Moon rise/set/phase: **`suncalc`** (npm, `src/services/moonService.js`) — pure
