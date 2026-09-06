@@ -183,6 +183,19 @@
   filter: grayscale(0.6);
 }
 
+/* Days from the adjacent (previous/next) month - real data, just faded so the
+   currently-selected month reads as the visual focus. */
+.cellAdjacent {
+  background: color-mix(in srgb, var(--color-surface) 45%, transparent);
+  opacity: 0.5;
+  cursor: default;
+}
+
+.cellAdjacent:hover {
+  transform: none;
+  border-color: var(--color-border);
+}
+
 .cellToday {
   border-color: #f97316;
   border-width: 2px;

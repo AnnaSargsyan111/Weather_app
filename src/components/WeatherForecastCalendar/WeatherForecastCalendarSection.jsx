@@ -31,7 +31,10 @@ export default function WeatherForecastCalendarSection({ months, unit, loading }
 
   if (!months) return null;
 
-  const activeMonth = months.find((m) => m.key === activeKey) || months[0];
+  const activeIndex = months.findIndex((m) => m.key === activeKey);
+  const activeMonth = activeIndex >= 0 ? months[activeIndex] : months[0];
+  const previousMonth = activeIndex > 0 ? months[activeIndex - 1] : null;
+  const nextMonth = activeIndex >= 0 && activeIndex < months.length - 1 ? months[activeIndex + 1] : null;
 
   return (
     <section className={styles.section}>
@@ -54,7 +57,13 @@ export default function WeatherForecastCalendarSection({ months, unit, loading }
 
       <MonthInsightBanner month={activeMonth} unit={unit} />
       <MonthSelector months={months} activeKey={activeMonth.key} onSelect={setActiveKey} unit={unit} />
-      <ForecastGrid month={activeMonth} unit={unit} filter={filter} />
+      <ForecastGrid
+        month={activeMonth}
+        previousMonth={previousMonth}
+        nextMonth={nextMonth}
+        unit={unit}
+        filter={filter}
+      />
     </section>
   );
 }

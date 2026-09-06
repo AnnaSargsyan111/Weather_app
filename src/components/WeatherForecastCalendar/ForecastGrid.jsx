@@ -2,6 +2,7 @@ import ForecastDayCell from "./ForecastDayCell.jsx";
 import styles from "./WeatherForecastCalendar.module.css";
 
 const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const GRID_SIZE = 7;
 
 function matchesFilter(day, filter) {
   if (filter === "rainy") return day.isRainy;
@@ -17,9 +18,19 @@ function isSameDate(dateStr) {
   return dateStr === todayStr;
 }
 
-export default function ForecastGrid({ month, unit, filter }) {
-  const leadingPadding = month.days[0]?.weekday ?? 0;
-  const cells = [...Array(leadingPadding).fill(null), ...month.days];
+export default function ForecastGrid({ month, previousMonth, nextMonth, unit, filter }) {
+  const leadingCount = month.days[0]?.weekday ?? 0;
+  const leadingCells = previousMonth ? previousMonth.days.slice(-leadingCount) : Array(leadingCount).fill(null);
+
+  const totalSoFar = leadingCells.length + month.days.length;
+  const trailingCount = (GRID_SIZE - (totalSoFar % GRID_SIZE)) % GRID_SIZE;
+  const trailingCells = nextMonth ? nextMonth.days.slice(0, trailingCount) : Array(trailingCount).fill(null);
+
+  const cells = [
+    ...leadingCells.map((day) => ({ day, isAdjacent: true })),
+    ...month.days.map((day) => ({ day, isAdjacent: false })),
+    ...trailingCells.map((day) => ({ day, isAdjacent: true })),
+  ];
 
   return (
     <div className={styles.gridPanel}>
@@ -31,13 +42,14 @@ export default function ForecastGrid({ month, unit, filter }) {
         ))}
       </div>
       <div className={styles.grid}>
-        {cells.map((day, index) => (
+        {cells.map(({ day, isAdjacent }, index) => (
           <ForecastDayCell
             key={day?.date ?? `pad-${index}`}
             day={day}
             unit={unit}
-            isToday={day && isSameDate(day.date)}
-            matchesFilter={filter !== "all" && day && matchesFilter(day, filter)}
+            isAdjacent={isAdjacent}
+            isToday={day && !isAdjacent && isSameDate(day.date)}
+            matchesFilter={!isAdjacent && filter !== "all" && day && matchesFilter(day, filter)}
           />
         ))}
       </div>

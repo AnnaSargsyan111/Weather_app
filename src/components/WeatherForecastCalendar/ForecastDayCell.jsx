@@ -6,7 +6,7 @@ import styles from "./WeatherForecastCalendar.module.css";
 
 const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-export default function ForecastDayCell({ day, unit, matchesFilter, isToday }) {
+export default function ForecastDayCell({ day, unit, matchesFilter, isToday, isAdjacent }) {
   const [position, setPosition] = useState(null);
   const cellRef = useRef(null);
 
@@ -20,7 +20,12 @@ export default function ForecastDayCell({ day, unit, matchesFilter, isToday }) {
     setPosition(null);
   }
 
-  const classNames = [styles.cell, isToday ? styles.cellToday : "", matchesFilter ? styles.filterMatch : ""]
+  const classNames = [
+    styles.cell,
+    isAdjacent ? styles.cellAdjacent : "",
+    isToday ? styles.cellToday : "",
+    matchesFilter ? styles.filterMatch : "",
+  ]
     .filter(Boolean)
     .join(" ");
 
@@ -28,11 +33,11 @@ export default function ForecastDayCell({ day, unit, matchesFilter, isToday }) {
     <div
       ref={cellRef}
       className={classNames}
-      onMouseEnter={show}
-      onMouseLeave={hide}
-      onFocus={show}
-      onBlur={hide}
-      tabIndex={0}
+      onMouseEnter={isAdjacent ? undefined : show}
+      onMouseLeave={isAdjacent ? undefined : hide}
+      onFocus={isAdjacent ? undefined : show}
+      onBlur={isAdjacent ? undefined : hide}
+      tabIndex={isAdjacent ? -1 : 0}
     >
       <div className={styles.cellTop}>
         <span className={styles.cellWeekday}>{WEEKDAY_LABELS[day.weekday]}</span>
@@ -45,8 +50,8 @@ export default function ForecastDayCell({ day, unit, matchesFilter, isToday }) {
         <span className={styles.cellMax}>{formatTemp(day.tempMax, unit)}</span>
         <span className={styles.cellMin}>{formatTemp(day.tempMin, unit)}</span>
       </div>
-      {day.source === "estimated" && <span className={styles.estimatedBadge}>Estimated</span>}
-      <DayHoverCard day={day} position={position} unit={unit} />
+      {!isAdjacent && day.source === "estimated" && <span className={styles.estimatedBadge}>Estimated</span>}
+      {!isAdjacent && <DayHoverCard day={day} position={position} unit={unit} />}
     </div>
   );
 }
