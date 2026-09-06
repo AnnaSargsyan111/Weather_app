@@ -1,7 +1,11 @@
+import styles from "./WeatherOverview.module.css";
+
 const SIZE = 180;
 const CENTER = SIZE / 2;
 const RADIUS = 76;
-const STROKE = 24;
+// Thinner ring (was 24) so the inner hole is bigger and long center labels never
+// overlap the colored segments.
+const STROKE = 16;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 const COLORS = {
@@ -42,19 +46,7 @@ export default function DonutChart({ stats, children }) {
             )
         )}
       </svg>
-      {children && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {children}
-        </div>
-      )}
+      {children && <div className={styles.chartCenter}>{children}</div>}
     </div>
   );
 }

@@ -47,6 +47,8 @@ export function computeOverviewStats(days, selectedMonths, selectedYears) {
   };
 }
 
+// Just the value half of the label (the "Selected date:" prefix is rendered separately
+// as its own line so the two can be styled/sized independently in the donut center).
 export function overviewTitle(selectedMonths, selectedYears) {
   const years = [...selectedYears].sort((a, b) => a - b);
   const months = [...selectedMonths].sort((a, b) => a - b);
@@ -55,10 +57,10 @@ export function overviewTitle(selectedMonths, selectedYears) {
     return `${years[0]} ${MONTH_ABBR[months[0]]}`;
   }
   if (years.length > 1) {
-    return `Selected date: ${years[0]}-${years[years.length - 1]}`;
+    return `${years[0]}-${years[years.length - 1]}`;
   }
   if (months.length > 1) {
-    return `Selected date: ${MONTH_ABBR[months[0]]}-${MONTH_ABBR[months[months.length - 1]]}, ${years[0]}`;
+    return `${MONTH_ABBR[months[0]]}-${MONTH_ABBR[months[months.length - 1]]}, ${years[0]}`;
   }
-  return "Selected date";
+  return "";
 }
