@@ -50,10 +50,24 @@ export default function MultiSelectFilter({ label, options, selected, onChange }
     onChange(allSelected ? [] : options.map((o) => o.value));
   }
 
+  // A contiguous run (e.g. Jan-Sep, or three consecutive years) reads as a compact
+  // range instead of "9 selected" - shorter, and it says exactly what's selected rather
+  // than a count that tells you nothing about which ones.
+  const sortedSelected = [...selected].sort((a, b) => a - b);
+  const isContiguousRange =
+    selected.length > 1 && sortedSelected.every((value, i) => i === 0 || value === sortedSelected[i - 1] + 1);
+
+  function shortLabelFor(value) {
+    const option = options.find((o) => o.value === value);
+    return option?.shortLabel ?? option?.label;
+  }
+
   const summary = allSelected
     ? "All"
     : selected.length === 1
     ? options.find((o) => o.value === selected[0])?.label
+    : isContiguousRange
+    ? `${shortLabelFor(sortedSelected[0])}–${shortLabelFor(sortedSelected[sortedSelected.length - 1])}`
     : `${selected.length} selected`;
 
   return (

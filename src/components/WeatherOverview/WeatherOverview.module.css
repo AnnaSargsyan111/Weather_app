@@ -4,7 +4,7 @@
 
 .sectionHeader {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -17,11 +17,23 @@
   font-weight: 700;
   color: var(--color-text);
   margin: 0;
+  white-space: nowrap;
 }
 
 .filters {
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 420px) {
+  .sectionHeader {
+    flex-wrap: wrap;
+  }
+
+  .sectionTitle {
+    white-space: normal;
+  }
 }
 
 .card {

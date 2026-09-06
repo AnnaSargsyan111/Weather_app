@@ -1,13 +1,13 @@
 import { useMemo, useState } from "react";
 import MultiSelectFilter from "./MultiSelectFilter.jsx";
 import DonutChart from "./DonutChart.jsx";
-import { MONTH_NAMES, computeOverviewStats, overviewTitle } from "../../utils/weatherOverviewHelpers.js";
+import { MONTH_NAMES, MONTH_ABBR, computeOverviewStats, overviewTitle } from "../../utils/weatherOverviewHelpers.js";
 import { formatTemp } from "../../utils/temperature.js";
 import styles from "./WeatherOverview.module.css";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEAR_OPTIONS = [CURRENT_YEAR - 2, CURRENT_YEAR - 1, CURRENT_YEAR];
-const MONTH_OPTIONS = MONTH_NAMES.map((name, index) => ({ value: index, label: name }));
+const MONTH_OPTIONS = MONTH_NAMES.map((name, index) => ({ value: index, label: name, shortLabel: MONTH_ABBR[index] }));
 const YEAR_SELECT_OPTIONS = YEAR_OPTIONS.map((year) => ({ value: year, label: String(year) }));
 // Default selection on load: January through September only (indices 0-8) - October
 // through December start deselected. Purely the initial state; still fully editable

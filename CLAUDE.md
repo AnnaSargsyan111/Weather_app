@@ -176,6 +176,19 @@ state (e.g. Year defaults to just the current year) never gets its freshly-mount
 "Select all" checkbox flagged indeterminate on first open — the effect already fired once
 at mount when the ref was still null.
 
+Month defaults to January-September (`DEFAULT_MONTHS` in `WeatherOverviewSection.jsx`,
+indices 0-8) rather than all 12 - October-December of the current year haven't happened
+yet. All 12 months stay selectable, though (unlike Year, which drops the future year from
+its option list entirely) - removing them from the options list too would also block
+picking October-December for a *past* year like 2024/2025, which do have real data.
+`MultiSelectFilter`'s trigger summary shows a compact range ("Jan–Sep") instead of "9
+selected" whenever the current selection is a contiguous run - each option can carry an
+optional `shortLabel` (month options set it to `MONTH_ABBR`) used only for this range
+text; the per-option list still shows the full name. This was deliberately not changed to
+just say "All" when the default 9 are selected - that would misrepresent the actual
+state (and contradict the Select-all checkbox, which correctly shows unchecked/
+indeterminate, not checked, for a 9-of-12 selection).
+
 ## ClimateSummary (climate extremes + daily summary tables)
 
 `src/components/ClimateSummary/` — two side-by-side cards rendered directly below
