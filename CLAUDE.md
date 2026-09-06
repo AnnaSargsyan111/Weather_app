@@ -156,7 +156,18 @@ and every day must land in one. Year options are computed as `[currentYear-2 .. 
 rather than hardcoded, so the widget doesn't silently go stale. Selecting a
 not-yet-happened year (or the un-elapsed months of the current year) correctly shows an
 honest "no recorded data yet" empty state instead of fabricating numbers — same
-real-data-first principle applied throughout this app.
+real-data-first principle applied throughout this app. The card has `max-width: 560px`
+so it doesn't stretch full-width when the donut+legend content is much narrower than the
+page.
+
+`MultiSelectFilter.jsx` (shared by both the Month and Year dropdowns) has a "Select all"
+option pinned as the first item. Its native-checkbox `indeterminate` flag is set in a
+`useEffect` — but that checkbox only exists in the DOM while the dropdown is open (the
+menu is `{open && (...)}`), so `open` must be in the effect's dependency array alongside
+`allSelected`/`selected.length`. Without it, a filter that starts in a partial-selection
+state (e.g. Year defaults to just the current year) never gets its freshly-mounted
+"Select all" checkbox flagged indeterminate on first open — the effect already fired once
+at mount when the ref was still null.
 
 ## Roadmap ideas (not yet built)
 
