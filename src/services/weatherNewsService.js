@@ -13,8 +13,12 @@ const MAX_ARTICLES = 6;
 
 const CLIMATE_KEYWORDS = [
   "climate", "warming", "carbon", "emission", "greenhouse", "sea level", "sea-level",
-  "glacier", "ice sheet", "heatwave", "drought", "wildfire", "fossil fuel", "renewable",
-  "net zero", "net-zero", "global heating", "temperature record",
+  "glacier", "ice sheet", "heatwave", "heat wave", "drought", "wildfire", "fossil fuel",
+  "renewable", "net zero", "net-zero", "global heating", "temperature record",
+  "record temperature", "record heat", "extreme weather", "extreme heat", "cold snap",
+  "polar vortex", "hurricane", "cyclone", "typhoon", "tropical storm", "storm surge",
+  "flooding", "climate emergency", "weather warning", "rising temperatures",
+  "hottest", "warmest", "coldest",
 ];
 
 // Matches on the title only, not the full article body - a body can mention "climate"
@@ -70,16 +74,32 @@ async function fetchFeed(feedUrl) {
   }));
 }
 
+// Two feeds can carry the same real-world story under different guids (or the same
+// feed can re-list an item after an edit), which would otherwise render the identical
+// headline/link twice. Keyed by link first - the one thing guaranteed to point at the
+// same actual article - falling back to id only when a link is somehow missing.
+function dedupeArticles(articles) {
+  const seen = new Map();
+  for (const article of articles) {
+    const key = article.link || article.id;
+    if (!seen.has(key)) seen.set(key, article);
+  }
+  return Array.from(seen.values());
+}
+
 // Fetches every configured feed in parallel and keeps whichever succeed - one flaky
 // feed (the free rss2json tier is rate-limited) shouldn't take down the whole section.
-// Throws only if every feed failed, so the caller can show a real error state.
+// Throws only if every feed failed, so the caller can show a real error state. Called
+// on a timer by useWeatherNews, so every call re-derives the current latest-6 from
+// scratch - there's no persisted "the 6 articles", just whichever 6 real, deduped,
+// climate-relevant items are newest right now.
 export async function getWeatherNews() {
   const results = await Promise.allSettled(FEEDS.map(fetchFeed));
   const articles = results.filter((r) => r.status === "fulfilled").flatMap((r) => r.value);
 
   if (articles.length === 0) throw new Error("News is currently unavailable.");
 
-  return articles
+  return dedupeArticles(articles)
     .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
     .slice(0, MAX_ARTICLES);
 }

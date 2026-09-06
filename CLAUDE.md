@@ -481,16 +481,33 @@ throws if both fail. `isClimateRelevant` filters every item by keyword match **o
 title only** (not the body) before it's shown, since both feeds carry loosely-tagged
 items (general politics op-eds, archaeology, wildlife policy) that aren't actually about
 climate/warming, and a keyword appearing anywhere in the body text (e.g. "political
-climate") produced false positives when body text was included. Results are capped to
-the 6 most recent qualifying articles (`MAX_ARTICLES`). There is deliberately no category
-filter UI (an earlier version had All News/Global Warming/Climate Change tabs - removed
-per Anna's request; the service still only sources from climate-focused feeds, so
-narrowing was never load-bearing on the tabs). `decodeEntities` un-escapes `&amp;` etc.
-in titles/thumbnail URLs - rss2json passes some fields through still HTML-entity-escaped,
+climate") produced false positives when body text was included. Results are deduped (by `link`, falling back to `id` if a link is ever missing - two
+feeds can carry the same real story under different guids), sorted newest-first by
+`publishedAt`, then capped to the 6 most recent qualifying articles (`MAX_ARTICLES`).
+This is a rolling window, not a fixed set: [useWeatherNews.js](weather-app/src/hooks/useWeatherNews.js)
+re-runs the whole fetch-dedupe-sort-slice pipeline every 15 minutes
+(`REFRESH_INTERVAL_MS`), so as newer articles get published, they naturally displace
+older ones from the visible 6 - there's no persisted "the 6 articles," only whichever 6
+real, deduped, qualifying items are newest at the moment of each fetch. A refresh that
+fails (e.g. a rate-limited feed) keeps showing the last known-good 6 instead of
+blanking the section - the error state only surfaces if there's nothing to fall back to
+yet. `CLIMATE_KEYWORDS` was widened past the original narrow set (which sometimes let
+fewer than 6 real articles qualify even when the feeds had plenty of genuine weather
+coverage, e.g. "Sydney reaches 33C in potentially warmest start to spring..." matched
+nothing) to also catch phrases like "extreme heat," "record heat," "hurricane," and
+bare "hottest"/"warmest"/"coldest" - safe to broaden since both source feeds are
+already topically scoped (climate-crisis, science & environment), unlike a general news
+feed where those words would be noisy. There is deliberately no category filter UI (an
+earlier version had All News/Global Warming/Climate Change tabs - removed per Anna's
+request; the service still only sources from climate-focused feeds, so narrowing was
+never load-bearing on the tabs). `decodeEntities` un-escapes `&amp;` etc. in
+titles/thumbnail URLs - rss2json passes some fields through still HTML-entity-escaped,
 which silently breaks an image `src` if left as-is (literal `&amp;` isn't a valid query
 separator). Like/dislike counts are pure local UI state seeded at 0, not real published
 metrics presented as fact - clicking is a genuine mutually-exclusive single-vote toggle,
-not a fabricated existing count.
+not a fabricated existing count; that state is keyed by article `id`, so a vote is
+naturally dropped (not carried over to a different story) once its article rolls off
+the visible 6 after a refresh.
 
 ## SideNav (floating section-jump rail)
 
