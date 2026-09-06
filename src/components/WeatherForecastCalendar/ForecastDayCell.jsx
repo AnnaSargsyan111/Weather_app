@@ -1,34 +1,52 @@
+import { useRef, useState } from "react";
 import WeatherIcon from "../WeatherIcon/WeatherIcon.jsx";
+import DayHoverCard from "./DayHoverCard.jsx";
 import { formatTemp } from "../../utils/temperature.js";
 import styles from "./WeatherForecastCalendar.module.css";
 
-function heatClass(tempMaxCelsius) {
-  if (!Number.isFinite(tempMaxCelsius)) return "";
-  if (tempMaxCelsius < 15) return styles.heatCool;
-  if (tempMaxCelsius < 25) return styles.heatMild;
-  if (tempMaxCelsius < 30) return styles.heatWarm;
-  return styles.heatHot;
-}
+const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-export default function ForecastDayCell({ day, unit, matchesFilter }) {
+export default function ForecastDayCell({ day, unit, matchesFilter, isToday }) {
+  const [position, setPosition] = useState(null);
+  const cellRef = useRef(null);
+
   if (!day) return <div className={`${styles.cell} ${styles.cellPadding}`} aria-hidden="true" />;
 
-  const classNames = [styles.cell, heatClass(day.tempMax), matchesFilter ? styles.filterMatch : ""]
+  function show() {
+    const rect = cellRef.current.getBoundingClientRect();
+    setPosition({ top: rect.bottom + 6, left: Math.min(rect.left, window.innerWidth - 180) });
+  }
+  function hide() {
+    setPosition(null);
+  }
+
+  const classNames = [styles.cell, isToday ? styles.cellToday : "", matchesFilter ? styles.filterMatch : ""]
     .filter(Boolean)
     .join(" ");
 
   return (
-    <div className={classNames}>
+    <div
+      ref={cellRef}
+      className={classNames}
+      onMouseEnter={show}
+      onMouseLeave={hide}
+      onFocus={show}
+      onBlur={hide}
+      tabIndex={0}
+    >
       <div className={styles.cellTop}>
-        <span className={styles.cellDate}>{day.day}</span>
-        {day.isRainy && <span className={styles.cellBadge}>💧 {day.precipitation.toFixed(1)}mm</span>}
+        <span className={styles.cellWeekday}>{WEEKDAY_LABELS[day.weekday]}</span>
+        <span className={styles.cellDate}>
+          {new Date(`${day.date}T00:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+        </span>
       </div>
       <WeatherIcon icon={day.condition.icon} size={28} className={styles.cellIcon} />
-      <div className={styles.cellMetrics}>
-        <div className={styles.cellMetricsLabel}>Avg</div>
-        <div className={styles.cellMax}>{formatTemp(day.tempMax, unit)}</div>
-        <div className={styles.cellMin}>{formatTemp(day.tempMin, unit)}</div>
+      <div className={styles.cellTemps}>
+        <span className={styles.cellMax}>{formatTemp(day.tempMax, unit)}</span>
+        <span className={styles.cellMin}>{formatTemp(day.tempMin, unit)}</span>
       </div>
+      {day.source === "estimated" && <span className={styles.estimatedBadge}>Estimated</span>}
+      <DayHoverCard day={day} position={position} unit={unit} />
     </div>
   );
 }

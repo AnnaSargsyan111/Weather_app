@@ -79,18 +79,6 @@ entire UI. Rain/snow render on a single `<canvas>` (not per-particle DOM nodes) 
 (scroll parallax, lightning, wind-driven card jitter were deferred) — see git history
 if extending it further.
 
-## DailyForecast (real 16-day forecast strip)
-
-`src/components/DailyForecast/` (`src/services/dailyForecastService.js`,
-`src/hooks/useDailyForecast.js`) — a horizontal strip showing Open-Meteo's real daily
-forecast out to `forecast_days=16`, the actual physical limit of reliable day-by-day
-weather prediction (verified live). **Note**: Open-Meteo's day 16 consistently returns
-`null` for temperatures (verified via a raw curl check) — this is a real API boundary
-effect, not a bug; `formatTemp`'s existing `--°` fallback handles it gracefully. This
-exists specifically because a genuine forward-looking forecast is NOT possible beyond
-this window — see the "Weather forecast" section below for how that constraint was
-handled for the (much longer) 12-month view.
-
 ## WeatherDetails (13-card detailed dashboard)
 
 `src/components/WeatherDetails/` — the "Weather details" section below the map, one
@@ -107,30 +95,53 @@ plus a `DetailCard`/`Badge` shell — deliberately kept on this app's existing C
 + react-icons stack rather than the Tailwind/Lucide the original design spec suggested,
 to avoid mixing two styling systems in one small app.
 
-## WeatherForecastCalendar ("Weather forecast" 12-month history)
+## WeatherForecastCalendar ("Weather forecast" 12-month calendar)
 
 `src/components/WeatherForecastCalendar/` — the section below Weather Details: a
-12-month selector + heatmap calendar grid. **Important**: despite the "forecast" name
-(kept because that's what the user asked to call it), this shows real **historical**
-data from Open-Meteo's free Archive API (`src/services/historicalWeatherService.js`,
-`archive-api.open-meteo.com`), not predictions — genuine day-by-day forecasts 12 months
-out don't exist for any weather API. The original design spec asked for fabricated mock
-data and a fake "AI Trend Insight" sentence; both were replaced with real computed stats
-(see the Month Insight banner) to avoid ever presenting made-up numbers as real analysis.
-`useMonthlyHistory.js` fetches once per location and buckets the flat daily arrays into
-12 month objects (see the hook for the exact shape). The grid uses
-`grid-template-columns: repeat(7, minmax(0, 1fr))` (not bare `1fr`) — a bare `1fr` grid
-blew out past the viewport on mobile because it doesn't allow tracks to shrink below
-their content's min-content width; `minmax(0, 1fr)` plus `min-width: 0` on `.cell` fixed
-it. The glass-panel look (`.glassPanel` in `WeatherForecastCalendar.module.css`) uses
-`color-mix(in srgb, var(--color-surface) 72%, transparent)` + `backdrop-filter: blur()`
-so it stays theme-aware rather than the spec's fixed dark-only background. Day Detail
-drawer (hourly chart, UV/AQI/moon/clothing advisory) was scoped out of this pass — noted
-below.
+forward-looking 12-month selector + full calendar grid, **starting at the current month**
+and running 12 months ahead (e.g. Sep 2026 → Aug 2027), defaulting to the current month
+on load. `useForecastCalendar.js` is the single hook driving it, and it deliberately
+mixes two real, distinct data sources per day rather than ever fabricating a value from
+nothing:
+
+- **`source: "live"`** — real data from Open-Meteo's forecast endpoint
+  (`src/services/dailyForecastService.js`, `past_days=31&forecast_days=16`), covering
+  the actual physical window where day-by-day prediction is reliable (`past_days`
+  additionally covers already-elapsed days of the current month with real observed
+  data, so "this month" never needs an estimate for a day that's already happened).
+- **`source: "estimated"`** — for every date beyond that real window, generated from
+  real historical data for the *same calendar date one year earlier*
+  (`src/services/historicalWeatherService.js`'s `getHistoricalRange`, Archive API) with
+  a small deterministic pseudo-random variation (`seededVariation` in the hook — seeded
+  by date string, not `Math.random()`, so values stay stable across re-renders) so
+  estimates read as approximate rather than an exact repeat of last year. Every
+  estimated cell carries an `estimateBasis` (e.g. "Sep 2025") and renders a small
+  "Estimated" badge (`ForecastDayCell.jsx`) plus shows its basis in the per-day hover
+  card (`DayHoverCard.jsx`, portal-rendered like `InfoTooltip`). This replaced an
+  earlier design spec that asked for fabricated mock data and a fake "AI Trend Insight"
+  sentence — both were rejected in favor of this real-data-first approach so nothing in
+  the UI is ever presented as a guaranteed forecast when it isn't one.
+
+**Known gotcha, fixed once already**: date math here MUST use local-date components
+(`getFullYear()`/`getMonth()`/`getDate()`), never `date.toISOString().slice(0,10)` —
+`toISOString()` converts to UTC first, which silently shifts the date backward by one
+day whenever the system timezone is ahead of UTC (this exact bug caused Sep 1 to render
+as "Aug 31" during testing). Both `isoDate()` helpers (in the hook and in
+`historicalWeatherService.js`) were fixed to format from local components instead.
+
+The grid uses `grid-template-columns: repeat(7, minmax(0, 1fr))` (not bare `1fr`) — a
+bare `1fr` grid blew out past the viewport on mobile because it doesn't allow tracks to
+shrink below their content's min-content width; `minmax(0, 1fr)` plus `min-width: 0` on
+`.cell` fixed it. The glass-panel look (`.glassPanel` in
+`WeatherForecastCalendar.module.css`) uses `color-mix(in srgb, var(--color-surface) 72%,
+transparent)` + `backdrop-filter: blur()` so it stays theme-aware rather than a fixed
+dark-only background. A standalone "16-Day Forecast" section used to exist separately
+(`src/components/DailyForecast/`) but was removed and folded into this one, per explicit
+request — don't recreate it as a separate section. Day Detail drawer (hourly chart,
+UV/AQI/moon/clothing advisory) is still scoped out of this pass — noted below.
 
 ## Roadmap ideas (not yet built)
 
-- Multi-day forecast strip (Open-Meteo's `daily` block already has the data available).
 - Optional Google Maps mode behind a `VITE_GOOGLE_MAPS_API_KEY` env var, if Anna decides
   she wants Google's map styling badly enough to set up billing for it.
 - Atmosphere follow-ups if wanted: subtle scroll parallax for sun/moon, restrained

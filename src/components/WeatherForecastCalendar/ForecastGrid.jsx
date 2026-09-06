@@ -9,6 +9,14 @@ function matchesFilter(day, filter) {
   return false;
 }
 
+function isSameDate(dateStr) {
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(
+    today.getDate()
+  ).padStart(2, "0")}`;
+  return dateStr === todayStr;
+}
+
 export default function ForecastGrid({ month, unit, filter }) {
   const leadingPadding = month.days[0]?.weekday ?? 0;
   const cells = [...Array(leadingPadding).fill(null), ...month.days];
@@ -28,6 +36,7 @@ export default function ForecastGrid({ month, unit, filter }) {
             key={day?.date ?? `pad-${index}`}
             day={day}
             unit={unit}
+            isToday={day && isSameDate(day.date)}
             matchesFilter={filter !== "all" && day && matchesFilter(day, filter)}
           />
         ))}

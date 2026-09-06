@@ -15,7 +15,7 @@ export default function WeatherForecastCalendarSection({ months, unit, loading }
   const [filter, setFilter] = useState("all");
 
   useEffect(() => {
-    if (months && months.length > 0) setActiveKey(months[months.length - 1].key);
+    if (months && months.length > 0) setActiveKey(months[0].key);
   }, [months]);
 
   if (loading && !months) {
@@ -24,14 +24,14 @@ export default function WeatherForecastCalendarSection({ months, unit, loading }
         <div className={styles.header}>
           <h2 className={styles.title}>Weather forecast</h2>
         </div>
-        <p style={{ color: "var(--color-text-tertiary)", fontSize: 13 }}>Loading 12 months of history…</p>
+        <p style={{ color: "var(--color-text-tertiary)", fontSize: 13 }}>Loading the 12-month forecast…</p>
       </section>
     );
   }
 
   if (!months) return null;
 
-  const activeMonth = months.find((m) => m.key === activeKey) || months[months.length - 1];
+  const activeMonth = months.find((m) => m.key === activeKey) || months[0];
 
   return (
     <section className={styles.section}>

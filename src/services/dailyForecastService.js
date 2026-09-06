@@ -5,14 +5,18 @@ const DAILY_PARAMS = [
   "weather_code",
   "precipitation_sum",
   "precipitation_probability_max",
+  "wind_speed_10m_max",
 ].join(",");
 
 // Real 16-day forecast - the actual physical limit of reliable day-by-day weather
 // prediction (verified live: forecast_days=16 returns exactly 16 real daily records).
+// past_days=31 also pulls in real (observed, not forecast) data for the rest of the
+// current month that's already elapsed, so "this month" never needs an estimate for
+// days that have already happened.
 export async function getDailyForecast(latitude, longitude) {
   const url =
     `${FORECAST_URL}?latitude=${latitude}&longitude=${longitude}` +
-    `&daily=${DAILY_PARAMS}&forecast_days=16&timezone=auto`;
+    `&daily=${DAILY_PARAMS}&past_days=31&forecast_days=16&timezone=auto`;
 
   const response = await fetch(url);
   if (!response.ok) throw new Error("16-day forecast is currently unavailable.");
@@ -28,5 +32,6 @@ export async function getDailyForecast(latitude, longitude) {
     weatherCode: daily.weather_code?.[i],
     precipitationSum: daily.precipitation_sum?.[i] ?? 0,
     precipitationProbability: daily.precipitation_probability_max?.[i] ?? 0,
+    windSpeed: daily.wind_speed_10m_max?.[i],
   }));
 }
