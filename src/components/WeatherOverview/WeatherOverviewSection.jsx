@@ -6,7 +6,7 @@ import { formatTemp } from "../../utils/temperature.js";
 import styles from "./WeatherOverview.module.css";
 
 const CURRENT_YEAR = new Date().getFullYear();
-const YEAR_OPTIONS = [CURRENT_YEAR - 2, CURRENT_YEAR - 1, CURRENT_YEAR, CURRENT_YEAR + 1];
+const YEAR_OPTIONS = [CURRENT_YEAR - 2, CURRENT_YEAR - 1, CURRENT_YEAR];
 const MONTH_OPTIONS = MONTH_NAMES.map((name, index) => ({ value: index, label: name }));
 const YEAR_SELECT_OPTIONS = YEAR_OPTIONS.map((year) => ({ value: year, label: String(year) }));
 

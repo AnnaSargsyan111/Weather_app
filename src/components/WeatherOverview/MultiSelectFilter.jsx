@@ -46,7 +46,8 @@ export default function MultiSelectFilter({ label, options, selected, onChange }
   }
 
   function selectAll() {
-    onChange(options.map((o) => o.value));
+    // True toggle: all selected -> clear everything, anything less -> select everything.
+    onChange(allSelected ? [] : options.map((o) => o.value));
   }
 
   const summary = allSelected
