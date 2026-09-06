@@ -152,22 +152,41 @@ filter change. `categorizeDayType` buckets every WMO weather code into exactly o
 the 3 categories the donut needs: "Sunny" here means *no precipitation* (clear through
 overcast/fog lumped together), "Rainy" is any liquid/mixed/thunderstorm precip, "Snowy"
 is snow codes — this is a deliberate simplification since the widget only has 3 slices
-and every day must land in one. Year options are computed as `[currentYear-2 .. +1]`
-rather than hardcoded, so the widget doesn't silently go stale. Selecting a
-not-yet-happened year (or the un-elapsed months of the current year) correctly shows an
-honest "no recorded data yet" empty state instead of fabricating numbers — same
-real-data-first principle applied throughout this app. The card has `max-width: 560px`
-so it doesn't stretch full-width when the donut+legend content is much narrower than the
-page.
+and every day must land in one. Year options are computed as `[currentYear-2 .. currentYear]`
+rather than hardcoded, so the widget doesn't silently go stale (no future year is offered,
+since there's nothing real to show for it yet). Selecting the un-elapsed months of the
+current year correctly shows an honest "no recorded data yet" empty state instead of
+fabricating numbers — same real-data-first principle applied throughout this app. The
+card has `max-width: 560px` so it doesn't stretch full-width when the donut+legend
+content is much narrower than the page.
 
 `MultiSelectFilter.jsx` (shared by both the Month and Year dropdowns) has a "Select all"
-option pinned as the first item. Its native-checkbox `indeterminate` flag is set in a
-`useEffect` — but that checkbox only exists in the DOM while the dropdown is open (the
-menu is `{open && (...)}`), so `open` must be in the effect's dependency array alongside
+option pinned as the first item, and it's a true toggle: everything selected -> clicking
+it clears the selection, anything less -> clicking it selects everything (it does *not*
+enforce "at least one selected" the way the per-option checkboxes do — that guard only
+lives in `toggle()`). Its native-checkbox `indeterminate` flag is set in a `useEffect` —
+but that checkbox only exists in the DOM while the dropdown is open (the menu is
+`{open && (...)}`), so `open` must be in the effect's dependency array alongside
 `allSelected`/`selected.length`. Without it, a filter that starts in a partial-selection
 state (e.g. Year defaults to just the current year) never gets its freshly-mounted
 "Select all" checkbox flagged indeterminate on first open — the effect already fired once
 at mount when the ref was still null.
+
+## ClimateSummary (climate extremes + daily summary tables)
+
+`src/components/ClimateSummary/` — two side-by-side cards rendered directly below
+Weather overview, reusing the *same* `overviewDays` array `useWeatherOverview` already
+fetched (extended to also carry `precipitation`/`windSpeed` per day, which it fetched
+from the archive API all along but previously discarded). No separate fetch.
+`src/utils/climateSummaryHelpers.js`: `lastTwelveMonths(days)` takes the trailing 365
+days relative to the most recent *available* day (not `today`, since the archive has a
+few days of lag). `computeClimateExtremes` buckets days by calendar month regardless of
+year and picks the month with the highest/lowest *average* of the relevant metric for
+hottest/coldest/wettest/windiest — average rather than a monthly total, so a
+still-in-progress month isn't penalized for having fewer days than a complete one.
+`computeDailySummary` returns max/avg/min for high temp, low temp, precipitation (mm from
+the API, displayed in cm — divide by 10), and wind. Both cards stack to one column at
+`max-width: 720px` (see `ClimateSummary.module.css`).
 
 ## Roadmap ideas (not yet built)
 

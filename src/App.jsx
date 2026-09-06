@@ -9,6 +9,7 @@ import WeatherAtmosphere from "./components/WeatherAtmosphere/WeatherAtmosphere.
 import WeatherDetailsSection from "./components/WeatherDetails/WeatherDetailsSection.jsx";
 import WeatherForecastCalendarSection from "./components/WeatherForecastCalendar/WeatherForecastCalendarSection.jsx";
 import WeatherOverviewSection from "./components/WeatherOverview/WeatherOverviewSection.jsx";
+import ClimateSummarySection from "./components/ClimateSummary/ClimateSummarySection.jsx";
 import { WeatherSkeleton, MetricsSkeleton, MapSkeleton } from "./components/LoadingState/LoadingState.jsx";
 import { useSavedLocations } from "./hooks/useSavedLocations.js";
 import { useTheme } from "./hooks/useTheme.js";
@@ -100,6 +101,7 @@ export default function App() {
             loading={monthsLoading}
           />
           <WeatherOverviewSection days={overviewDays} unit={unit} loading={overviewLoading} />
+          <ClimateSummarySection days={overviewDays} unit={unit} loading={overviewLoading} />
           </>
         )}
       </main>

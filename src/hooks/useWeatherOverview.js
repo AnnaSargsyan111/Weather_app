@@ -41,6 +41,8 @@ export function useWeatherOverview(location) {
               month: d.getMonth(),
               tempMax: raw.tempMax[i],
               tempMin: raw.tempMin[i],
+              precipitation: raw.precipitation[i] ?? 0,
+              windSpeed: raw.windSpeed[i] ?? 0,
               type: categorizeDayType(raw.weatherCode[i]),
             };
           })
