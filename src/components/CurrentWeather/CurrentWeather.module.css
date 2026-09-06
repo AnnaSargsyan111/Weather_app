@@ -71,6 +71,10 @@
   font-weight: 500;
 }
 
+.coordinates {
+  grid-column: 1 / -1;
+}
+
 @media (max-width: 640px) {
   .temp {
     font-size: 64px;

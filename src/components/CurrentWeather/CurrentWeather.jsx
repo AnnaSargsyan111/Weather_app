@@ -42,6 +42,12 @@ export default function CurrentWeather({ location, weather, unit }) {
           <span className={styles.detailLabel}>Sunset</span>
           <span className={styles.detailValue}>{formatClockTime(weather.sunset)}</span>
         </li>
+        <li className={`${styles.detailItem} ${styles.coordinates}`}>
+          <span className={styles.detailLabel}>Coordinates</span>
+          <span className={styles.detailValue}>
+            Lat: {location.latitude.toFixed(2)}°&nbsp;&nbsp;Lon: {location.longitude.toFixed(2)}°
+          </span>
+        </li>
       </ul>
     </section>
   );
