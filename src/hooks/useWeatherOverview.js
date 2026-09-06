@@ -23,9 +23,11 @@ export function useWeatherOverview(location) {
     let cancelled = false;
     setState({ days: null, loading: true, error: null });
 
-    const today = new Date();
     const start = new Date(EARLIEST_YEAR, 0, 1);
-    const end = new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000); // archive lag buffer
+    const end = new Date(); // request through today - the archive may lag by a day or
+    // two for some locations, but that's already handled below by dropping any day the
+    // API doesn't have a real value for yet, rather than assuming a fixed cutoff and
+    // truncating days it actually does have.
 
     getHistoricalRange(location.latitude, location.longitude, start, end)
       .then((raw) => {
