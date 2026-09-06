@@ -48,6 +48,13 @@
   margin: 2px 0 0;
 }
 
+.insight {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-text-tertiary);
+  margin: 4px 0 0;
+}
+
 .details {
   display: grid;
   grid-template-columns: repeat(2, auto);

@@ -11,6 +11,7 @@ import WeatherForecastCalendarSection from "./components/WeatherForecastCalendar
 import WeatherOverviewSection from "./components/WeatherOverview/WeatherOverviewSection.jsx";
 import ClimateSummarySection from "./components/ClimateSummary/ClimateSummarySection.jsx";
 import WeatherNewsSection from "./components/WeatherNews/WeatherNewsSection.jsx";
+import WhatToWearSection from "./components/WhatToWear/WhatToWearSection.jsx";
 import SideNav from "./components/SideNav/SideNav.jsx";
 import { WeatherSkeleton, MetricsSkeleton, MapSkeleton } from "./components/LoadingState/LoadingState.jsx";
 import { useSavedLocations } from "./hooks/useSavedLocations.js";
@@ -22,6 +23,7 @@ import { useWeatherDetails } from "./hooks/useWeatherDetails.js";
 import { useForecastCalendar } from "./hooks/useForecastCalendar.js";
 import { useWeatherOverview } from "./hooks/useWeatherOverview.js";
 import { useWeatherNews } from "./hooks/useWeatherNews.js";
+import { useLocalClock } from "./hooks/useLocalClock.js";
 import styles from "./App.module.css";
 
 export default function App() {
@@ -35,6 +37,9 @@ export default function App() {
   const { articles: newsArticles, loading: newsLoading, error: newsError } = useWeatherNews();
   const [geoError, setGeoError] = useState(null);
   const scene = useAtmosphereScene(weather);
+  // Single source of truth for "the current local time at this location" - shared by
+  // CurrentWeather and WeatherDetailsSection so they can never show two different times.
+  const localTime = useLocalClock(weather?.timezone);
 
   return (
     <div className={styles.app}>
@@ -73,7 +78,13 @@ export default function App() {
                 ) : error ? (
                   <ErrorState message={error} />
                 ) : weather ? (
-                  <CurrentWeather location={activeLocation} weather={weather} unit={unit} />
+                  <CurrentWeather
+                    location={activeLocation}
+                    weather={weather}
+                    unit={unit}
+                    localTime={localTime}
+                    details={details}
+                  />
                 ) : null}
               </div>
 
@@ -99,7 +110,14 @@ export default function App() {
             </div>
           </div>
 
-          <WeatherDetailsSection details={details} dewPoint={weather?.dewPoint} unit={unit} loading={detailsLoading} />
+          <WeatherDetailsSection
+            details={details}
+            dewPoint={weather?.dewPoint}
+            unit={unit}
+            loading={detailsLoading}
+            localTime={localTime}
+          />
+          <WhatToWearSection details={details} weather={weather} />
           <WeatherForecastCalendarSection
             months={months}
             leadingPaddingDays={leadingPaddingDays}

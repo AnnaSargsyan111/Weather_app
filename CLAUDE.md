@@ -105,6 +105,15 @@ changed - with wider opacity/line-width variance per drop for a sense of depth) 
 more prominent, stormier rain mood; snow's canvas density and sky tint were left as
 they were, since only rain was reported as too subtle.
 
+Rain's fall angle was later made a deliberate stylistic choice rather than a physically
+wind-accurate one: `rainLean` in `PrecipitationCanvas.jsx`'s `step()` is
+`-1 + windLean * 0.25` - always negative (top-right to bottom-left), with real wind only
+adding a subtle secondary wobble on top rather than ever flipping the dominant diagonal.
+Used for both the per-frame `x` position update and the drawn streak's own tilt (`dx`),
+so the line itself visually slants the same direction it's moving. Snow's fall angle is
+untouched and still follows real `windLean` directly, since only rain's direction was
+asked to change.
+
 **Premium atmosphere upgrade** (scroll parallax, lightning, richer sun/moon/clouds):
 - **Sun/moon dimming by cloud cover**: previously the sun/moon's opacity depended only
   on `brightness` (time of day), so a full-opacity sun rendered even under heavy
@@ -225,6 +234,45 @@ actual current instant into that timezone's wall-clock time - so it uses
 alignment to the exact minute boundary. Switching the active location updates the
 displayed time immediately, without waiting for the next tick, since the format simply
 reapplies to the same current instant using the new `timezone`.
+
+**Update**: `useLocalClock` is now called exactly **once**, in `App.jsx`, and the
+resulting `localTime` string is passed down as a prop to both `CurrentWeather` and
+`WeatherDetailsSection` - not called separately in each. "Weather details" section's
+own heading merges that same value directly into the `<h2>` text ("Weather details
+9:51 PM", one space, no separator), replacing the old `.sectionTime` span that used to
+show `details.updatedAt` (a "last fetched" timestamp from `useWeatherDetails`, a
+different value than the live clock) - `details.updatedAt` itself is untouched and
+still used by `PressureCard`. Two components sharing one prop from a common ancestor,
+rather than each calling the hook independently, is what guarantees the two headings
+can never drift apart by even a tick.
+
+`CurrentWeather` also shows a one-line contextual insight under the condition label
+("Overcast" → "Rain is likely later today.") via `buildWeatherInsight` in
+`src/utils/weatherInsight.js`, built entirely from `details` (already-fetched hourly
+data from `useWeatherDetails` - no new fetch): precipitation probability takes priority
+over everything else, then a significant temperature swing, then strong wind, then a
+plain cloud-cover description as the fallback. `weather.time` (a naive local string) is
+parsed for its hour only to decide "this evening"/"this afternoon"/"today" phrasing -
+deliberately not `new Date(weather.time)`, which would parse that naive string against
+the *browser's* timezone rather than the location's.
+
+## WhatToWear (outfit recommendation)
+
+`src/components/WhatToWear/` - rendered directly after `WeatherDetailsSection`'s full
+metrics grid in `App.jsx` (a sibling section, not nested inside `WeatherDetailsSection`
+itself, so that component stays untouched). Reuses the same `details` object
+`WeatherDetailsSection` already has for its cards - no second weather-fetching system.
+`getOutfitRecommendation` (`src/utils/outfitAdvisor.js`) combines feels-like
+temperature, precipitation (current condition or ≥55% probability), and wind speed
+(≥30 km/h) rather than temperature alone - e.g. 24°C with strong wind gets the
+"windy" outfit set, not the same one as 24°C calm. All thresholds are Celsius, since
+`details.feelsLike.current`/`details.temperature.current` are always Celsius internally
+regardless of the unit toggle - this makes the whole feature correct under °F for free,
+with no unit-conversion logic of its own. Heading and card visually match
+`WeatherDetails.module.css`'s `.sectionTitle`/`.card` exactly (same glass pill, same
+opaque `--color-surface` card treatment) rather than introducing a new visual language.
+Icons are plain emoji (🧥👖👟☂️ etc.), matching the precedent already set by
+`DayHoverCard.jsx`'s 💧🌡️💨 - not a new icon system.
 
 ## WeatherDetails (13-card detailed dashboard)
 

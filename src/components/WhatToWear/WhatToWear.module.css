@@ -1,0 +1,87 @@
+.section {
+  margin-top: 28px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+/* Matches WeatherDetails' .sectionTitle exactly (same glass-pill treatment, same
+   reasoning: this sits directly on the animated sky, independent of Light/Dark theme) -
+   deliberately not a new heading style. */
+.sectionTitle {
+  display: inline-flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Same card language as the Weather details metric cards right above it (opaque
+   surface, not the hero glass treatment) - this section is a continuation of that
+   grid, not a new visual language. */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  transition: var(--transition-theme), border-color 0.15s ease;
+}
+
+.card:hover {
+  border-color: var(--color-border-strong);
+}
+
+.items {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 22px;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.itemIcon {
+  font-size: 19px;
+  line-height: 1;
+}
+
+.insight {
+  margin: 14px 0 0;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-text-tertiary);
+  line-height: 1.4;
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 16px;
+  }
+
+  .items {
+    gap: 16px;
+  }
+
+  .item {
+    font-size: 13px;
+  }
+}

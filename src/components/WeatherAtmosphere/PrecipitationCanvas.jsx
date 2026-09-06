@@ -60,7 +60,12 @@ export default function PrecipitationCanvas({ kind, intensity, windLean, reduced
       ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
 
       const isSnow = currentKind === "snow";
-      const angleLean = currentLean * (isSnow ? 6 : 14);
+      // Snow keeps drifting with the real wind direction. Rain is a deliberate stylistic
+      // choice instead of a physically wind-accurate angle: it always falls top-right to
+      // bottom-left (a negative x lean), with real wind only adding a subtle secondary
+      // wobble on top rather than ever flipping the dominant diagonal.
+      const rainLean = -1 + currentLean * 0.25;
+      const angleLean = isSnow ? currentLean * 6 : rainLean * 14;
 
       for (const p of particles) {
         if (isSnow) {
@@ -72,7 +77,7 @@ export default function PrecipitationCanvas({ kind, intensity, windLean, reduced
           ctx.fill();
         } else {
           const dx = angleLean * (p.length / 16);
-          p.x += currentLean * (p.speed / 5);
+          p.x += rainLean * (p.speed / 5);
           p.y += p.speed;
           ctx.globalAlpha = p.opacity;
           ctx.lineWidth = p.lineWidth;

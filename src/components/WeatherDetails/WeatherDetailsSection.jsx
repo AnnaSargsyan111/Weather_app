@@ -34,12 +34,12 @@ function DetailsSkeleton() {
   );
 }
 
-export default function WeatherDetailsSection({ details, dewPoint, unit, loading }) {
+export default function WeatherDetailsSection({ details, dewPoint, unit, loading, localTime }) {
   if (loading && !details) {
     return (
       <section id="weather-details" className={styles.section}>
         <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Weather details</h2>
+          <h2 className={styles.sectionTitle}>Weather details{localTime ? ` ${localTime}` : ""}</h2>
         </div>
         <DetailsSkeleton />
       </section>
@@ -51,8 +51,7 @@ export default function WeatherDetailsSection({ details, dewPoint, unit, loading
   return (
     <section id="weather-details" className={styles.section}>
       <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>Weather details</h2>
-        <span className={styles.sectionTime}>{details.updatedAt}</span>
+        <h2 className={styles.sectionTitle}>Weather details{localTime ? ` ${localTime}` : ""}</h2>
       </div>
       <div className={styles.grid}>
         <TemperatureCard data={details.temperature} unit={unit} />

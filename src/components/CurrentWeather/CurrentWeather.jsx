@@ -1,13 +1,13 @@
 import { getWeatherCondition } from "../../services/weatherCodes.js";
 import { formatTemp } from "../../utils/temperature.js";
 import { formatClockTime } from "../../utils/formatTime.js";
-import { useLocalClock } from "../../hooks/useLocalClock.js";
+import { buildWeatherInsight } from "../../utils/weatherInsight.js";
 import WeatherIcon from "../WeatherIcon/WeatherIcon.jsx";
 import styles from "./CurrentWeather.module.css";
 
-export default function CurrentWeather({ location, weather, unit }) {
+export default function CurrentWeather({ location, weather, unit, localTime, details }) {
   const condition = getWeatherCondition(weather.weatherCode, weather.isDay);
-  const localTime = useLocalClock(weather.timezone);
+  const insight = buildWeatherInsight(details, condition, weather);
 
   return (
     <section className={styles.section} aria-label="Current weather">
@@ -24,6 +24,7 @@ export default function CurrentWeather({ location, weather, unit }) {
           </span>
         </div>
         <p className={styles.condition}>{condition.label}</p>
+        {insight && <p className={styles.insight}>{insight}</p>}
       </div>
 
       <ul className={styles.details}>
