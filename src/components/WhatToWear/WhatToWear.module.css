@@ -2,6 +2,22 @@
   margin-top: 28px;
 }
 
+/* Mirrors App.module.css's .content grid (1.4fr/1fr, same 1024px collapse breakpoint)
+   so this card's width matches the Current Weather card exactly without stretching
+   full-width - the second column is intentionally left empty rather than duplicating
+   the map. */
+.row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 1024px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}
+
 .sectionHeader {
   display: flex;
   align-items: center;

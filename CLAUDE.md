@@ -258,21 +258,33 @@ the *browser's* timezone rather than the location's.
 
 ## WhatToWear (outfit recommendation)
 
-`src/components/WhatToWear/` - rendered directly after `WeatherDetailsSection`'s full
-metrics grid in `App.jsx` (a sibling section, not nested inside `WeatherDetailsSection`
-itself, so that component stays untouched). Reuses the same `details` object
-`WeatherDetailsSection` already has for its cards - no second weather-fetching system.
-`getOutfitRecommendation` (`src/utils/outfitAdvisor.js`) combines feels-like
-temperature, precipitation (current condition or ≥55% probability), and wind speed
-(≥30 km/h) rather than temperature alone - e.g. 24°C with strong wind gets the
-"windy" outfit set, not the same one as 24°C calm. All thresholds are Celsius, since
-`details.feelsLike.current`/`details.temperature.current` are always Celsius internally
-regardless of the unit toggle - this makes the whole feature correct under °F for free,
-with no unit-conversion logic of its own. Heading and card visually match
-`WeatherDetails.module.css`'s `.sectionTitle`/`.card` exactly (same glass pill, same
-opaque `--color-surface` card treatment) rather than introducing a new visual language.
-Icons are plain emoji (🧥👖👟☂️ etc.), matching the precedent already set by
-`DayHoverCard.jsx`'s 💧🌡️💨 - not a new icon system.
+`src/components/WhatToWear/` - rendered in `App.jsx` between the hero `.content` grid
+and `WeatherDetailsSection` (a sibling section, not nested inside `WeatherDetailsSection`
+itself, so that component stays untouched): **Current Weather → What to Wear Today →
+Weather details**. Reuses the same `details` object `WeatherDetailsSection` already has
+for its cards - no second weather-fetching system. `getOutfitRecommendation`
+(`src/utils/outfitAdvisor.js`) combines feels-like temperature, precipitation (current
+condition or ≥55% probability), and wind speed (≥30 km/h) rather than temperature
+alone - e.g. 24°C with strong wind gets the "windy" outfit set, not the same one as
+24°C calm. All thresholds are Celsius, since `details.feelsLike.current`/
+`details.temperature.current` are always Celsius internally regardless of the unit
+toggle - this makes the whole feature correct under °F for free, with no unit-conversion
+logic of its own. Heading and card visually match `WeatherDetails.module.css`'s
+`.sectionTitle`/`.card` exactly (same glass pill, same opaque `--color-surface` card
+treatment) rather than introducing a new visual language. Icons are plain emoji
+(🧥👖👟☂️ etc.), matching the precedent already set by `DayHoverCard.jsx`'s
+💧🌡️💨 - not a new icon system.
+
+The card's width is pinned to exactly match the Current Weather card's width (not
+full-width) via `.row` in `WhatToWear.module.css`: a `grid-template-columns: 1.4fr 1fr`
+grid identical to `App.module.css`'s `.content` (same ratio, same 1024px collapse
+breakpoint), with the card placed in the first column and the second left empty. This
+was deliberately done in `WhatToWear`'s own CSS rather than moving the component inside
+`.content`'s `.leftColumn` - `.content` uses `align-items: stretch` and the map column
+stretches to match whatever height `.leftColumn` ends up being, so adding a whole new
+card into that same flex column would have made the map stretch taller too. Mirroring
+the grid ratio in an independent container gets the exact same width with zero risk to
+the map's height.
 
 ## WeatherDetails (13-card detailed dashboard)
 

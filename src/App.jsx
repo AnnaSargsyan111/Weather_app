@@ -110,6 +110,7 @@ export default function App() {
             </div>
           </div>
 
+          <WhatToWearSection details={details} weather={weather} />
           <WeatherDetailsSection
             details={details}
             dewPoint={weather?.dewPoint}
@@ -117,7 +118,6 @@ export default function App() {
             loading={detailsLoading}
             localTime={localTime}
           />
-          <WhatToWearSection details={details} weather={weather} />
           <WeatherForecastCalendarSection
             months={months}
             leadingPaddingDays={leadingPaddingDays}
