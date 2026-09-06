@@ -5,7 +5,7 @@ export default function MetricCard({ icon: Icon, label, value, unit, context, de
   return (
     <div className={styles.card}>
       <div className={styles.top}>
-        <Icon size={18} className={styles.icon} aria-hidden="true" />
+        <Icon size={36} className={styles.icon} aria-hidden="true" />
         <span className={styles.label}>{label}</span>
         {description && (
           <span className={styles.infoSlot}>

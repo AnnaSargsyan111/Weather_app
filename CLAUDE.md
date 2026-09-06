@@ -192,6 +192,13 @@ icon vertically centered against the label's *full* two-line height by `.top`'s 
 `align-self` overrides that for just this one flex item, pinning it to the first line
 regardless of how many lines the label wraps to.
 
+**Update 3**: "increase every icon 2x" was scoped down (via a clarifying question, since
+a literal app-wide 2x risked overflowing tightly-sized contexts like 44px circular
+header buttons that were never part of this thread) to just this metrics-card area:
+`MetricCard`'s weather-type icon (`Icon size={...}` in `MetricCard.jsx`) went 18px →
+36px, and `InfoTooltip`'s trigger went 18px/13px-glyph → 36px/26px-glyph. Nowhere else
+in the app was touched.
+
 Section titles across `WeatherDetails`/`WeatherForecastCalendar`/`WeatherOverview`/
 `WeatherNews` are now uniformly 18px/700/`var(--color-text)` -
 `WeatherForecastCalendarSection`'s `.title` used to be a distinct 22px/800 gradient-clip
