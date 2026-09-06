@@ -37,7 +37,7 @@ function DetailsSkeleton() {
 export default function WeatherDetailsSection({ details, dewPoint, unit, loading }) {
   if (loading && !details) {
     return (
-      <section className={styles.section}>
+      <section id="weather-details" className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Weather details</h2>
         </div>
@@ -49,7 +49,7 @@ export default function WeatherDetailsSection({ details, dewPoint, unit, loading
   if (!details) return null;
 
   return (
-    <section className={styles.section}>
+    <section id="weather-details" className={styles.section}>
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>Weather details</h2>
         <span className={styles.sectionTime}>{details.updatedAt}</span>

@@ -11,6 +11,7 @@ import WeatherForecastCalendarSection from "./components/WeatherForecastCalendar
 import WeatherOverviewSection from "./components/WeatherOverview/WeatherOverviewSection.jsx";
 import ClimateSummarySection from "./components/ClimateSummary/ClimateSummarySection.jsx";
 import WeatherNewsSection from "./components/WeatherNews/WeatherNewsSection.jsx";
+import SideNav from "./components/SideNav/SideNav.jsx";
 import { WeatherSkeleton, MetricsSkeleton, MapSkeleton } from "./components/LoadingState/LoadingState.jsx";
 import { useSavedLocations } from "./hooks/useSavedLocations.js";
 import { useTheme } from "./hooks/useTheme.js";
@@ -51,6 +52,8 @@ export default function App() {
         onThemeChange={setTheme}
         onUnitChange={setUnit}
       />
+
+      {activeLocation && <SideNav />}
 
       <main className={styles.main}>
         {geoError && <DismissibleWarning message={geoError} onDismiss={() => setGeoError(null)} />}

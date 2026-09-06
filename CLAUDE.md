@@ -272,6 +272,26 @@ separator). Like/dislike counts are pure local UI state seeded at 0, not real pu
 metrics presented as fact - clicking is a genuine mutually-exclusive single-vote toggle,
 not a fabricated existing count.
 
+## SideNav (floating section-jump rail)
+
+`src/components/SideNav/` — a `position: fixed` pill on the left edge, vertically
+centered, rendered only when there's an active location (its targets don't exist
+otherwise). Collapsed state is just 5 dots; click (or hover, via `onMouseEnter` on the
+`<nav>`) expands it to icon+label rows for each section plus a divider and two bottom
+actions (scroll to top, refresh). Click-outside and Escape close it, same pattern as
+`MultiSelectFilter`'s dropdown.
+
+Each target section (`WeatherDetailsSection`, `WeatherForecastCalendarSection`,
+`WeatherOverviewSection`, `WeatherNewsSection`) has a plain DOM `id` added to its
+`<section>` (`weather-details`/`weather-forecast`/`weather-overview`/`weather-news`),
+plus `scroll-margin-top: 100px` on that section's own `.section` class so
+`scrollIntoView` stops below the sticky header instead of tucking the section title
+under it. "Current" has no section of its own — it's just `window.scrollTo({top: 0})`.
+Refresh is a literal `window.location.reload()`, not a silent in-app refetch - simplest
+option that unambiguously satisfies "reloads the dashboard data," though a smoother
+non-reloading refetch is possible later if wanted (would need each data hook to expose
+a manual refetch handle, which none currently do).
+
 ## Roadmap ideas (not yet built)
 
 - Optional Google Maps mode behind a `VITE_GOOGLE_MAPS_API_KEY` env var, if Anna decides

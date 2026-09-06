@@ -20,7 +20,7 @@ export default function WeatherForecastCalendarSection({ months, leadingPaddingD
 
   if (loading && !months) {
     return (
-      <section className={styles.section}>
+      <section id="weather-forecast" className={styles.section}>
         <div className={styles.header}>
           <h2 className={styles.title}>Weather forecast</h2>
         </div>
@@ -42,7 +42,7 @@ export default function WeatherForecastCalendarSection({ months, leadingPaddingD
   const nextMonth = activeIndex >= 0 && activeIndex < months.length - 1 ? months[activeIndex + 1] : null;
 
   return (
-    <section className={styles.section}>
+    <section id="weather-forecast" className={styles.section}>
       <div className={styles.header}>
         <h2 className={styles.title}>Weather forecast</h2>
         <div className={styles.filters}>

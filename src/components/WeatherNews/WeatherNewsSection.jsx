@@ -83,7 +83,7 @@ export default function WeatherNewsSection({ loading, articles, error }) {
   }
 
   return (
-    <section className={styles.section}>
+    <section id="weather-news" className={styles.section}>
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>Weather news</h2>
       </div>

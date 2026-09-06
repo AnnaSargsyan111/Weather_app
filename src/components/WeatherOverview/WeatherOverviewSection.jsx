@@ -25,7 +25,7 @@ export default function WeatherOverviewSection({ days, unit, loading }) {
 
   if (loading && !days) {
     return (
-      <section className={styles.section}>
+      <section id="weather-overview" className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Weather overview</h2>
         </div>
@@ -39,7 +39,7 @@ export default function WeatherOverviewSection({ days, unit, loading }) {
   if (!days) return null;
 
   return (
-    <section className={styles.section}>
+    <section id="weather-overview" className={styles.section}>
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>Weather overview</h2>
       </div>
