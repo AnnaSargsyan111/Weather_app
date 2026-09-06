@@ -8,6 +8,7 @@ import DismissibleWarning from "./components/ErrorState/DismissibleWarning.jsx";
 import WeatherAtmosphere from "./components/WeatherAtmosphere/WeatherAtmosphere.jsx";
 import WeatherDetailsSection from "./components/WeatherDetails/WeatherDetailsSection.jsx";
 import WeatherForecastCalendarSection from "./components/WeatherForecastCalendar/WeatherForecastCalendarSection.jsx";
+import WeatherOverviewSection from "./components/WeatherOverview/WeatherOverviewSection.jsx";
 import { WeatherSkeleton, MetricsSkeleton, MapSkeleton } from "./components/LoadingState/LoadingState.jsx";
 import { useSavedLocations } from "./hooks/useSavedLocations.js";
 import { useTheme } from "./hooks/useTheme.js";
@@ -16,6 +17,7 @@ import { useWeather } from "./hooks/useWeather.js";
 import { useAtmosphereScene } from "./hooks/useAtmosphereScene.js";
 import { useWeatherDetails } from "./hooks/useWeatherDetails.js";
 import { useForecastCalendar } from "./hooks/useForecastCalendar.js";
+import { useWeatherOverview } from "./hooks/useWeatherOverview.js";
 import styles from "./App.module.css";
 
 export default function App() {
@@ -25,6 +27,7 @@ export default function App() {
   const { data: weather, loading, error } = useWeather(activeLocation);
   const { data: details, loading: detailsLoading } = useWeatherDetails(activeLocation, weather);
   const { months, leadingPaddingDays, loading: monthsLoading } = useForecastCalendar(activeLocation);
+  const { days: overviewDays, loading: overviewLoading } = useWeatherOverview(activeLocation);
   const [geoError, setGeoError] = useState(null);
   const scene = useAtmosphereScene(weather);
 
@@ -96,6 +99,7 @@ export default function App() {
             unit={unit}
             loading={monthsLoading}
           />
+          <WeatherOverviewSection days={overviewDays} unit={unit} loading={overviewLoading} />
           </>
         )}
       </main>

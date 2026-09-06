@@ -140,6 +140,24 @@ dark-only background. A standalone "16-Day Forecast" section used to exist separ
 request — don't recreate it as a separate section. Day Detail drawer (hourly chart,
 UV/AQI/moon/clothing advisory) is still scoped out of this pass — noted below.
 
+## WeatherOverview (donut chart + multi-select filters)
+
+`src/components/WeatherOverview/` — a Sunny/Rainy/Snowy breakdown donut with independent
+multi-select Month and Year filters, plus average high/low. `useWeatherOverview.js`
+fetches every real historical day from `EARLIEST_YEAR` (2024) through today **once**
+(`historicalWeatherService.getHistoricalRange` — same service the forecast calendar
+uses), and `computeOverviewStats` in `src/utils/weatherOverviewHelpers.js` filters/
+aggregates that in-memory whenever the month/year selection changes — no refetch per
+filter change. `categorizeDayType` buckets every WMO weather code into exactly one of
+the 3 categories the donut needs: "Sunny" here means *no precipitation* (clear through
+overcast/fog lumped together), "Rainy" is any liquid/mixed/thunderstorm precip, "Snowy"
+is snow codes — this is a deliberate simplification since the widget only has 3 slices
+and every day must land in one. Year options are computed as `[currentYear-2 .. +1]`
+rather than hardcoded, so the widget doesn't silently go stale. Selecting a
+not-yet-happened year (or the un-elapsed months of the current year) correctly shows an
+honest "no recorded data yet" empty state instead of fabricating numbers — same
+real-data-first principle applied throughout this app.
+
 ## Roadmap ideas (not yet built)
 
 - Optional Google Maps mode behind a `VITE_GOOGLE_MAPS_API_KEY` env var, if Anna decides
