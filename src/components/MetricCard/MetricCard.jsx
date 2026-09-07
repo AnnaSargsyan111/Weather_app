@@ -16,8 +16,8 @@ export default function MetricCard({ icon: Icon, label, value, unit, context, de
       <div>
         <span className={styles.value}>{value}</span>
         {unit && <span className={styles.unit}>{unit}</span>}
+        {context && <span className={styles.context}>{context}</span>}
       </div>
-      {context && <span className={styles.context}>{context}</span>}
     </div>
   );
 }
