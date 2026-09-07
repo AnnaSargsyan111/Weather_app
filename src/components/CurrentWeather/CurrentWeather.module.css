@@ -40,6 +40,11 @@
 .iconWrap {
   color: var(--color-accent);
   display: flex;
+  align-items: center;
+  /* Deliberate nudge, not just the tempRow gap - the larger icon (82px, up from 72px)
+     needs a touch more breathing room from the temperature to read as intentional
+     spacing rather than the number and icon crowding each other. */
+  margin-left: 6px;
 }
 
 .condition {

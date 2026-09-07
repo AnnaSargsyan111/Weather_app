@@ -20,7 +20,7 @@ export default function CurrentWeather({ location, weather, unit, localTime, det
         <div className={styles.tempRow}>
           <span className={styles.temp}>{formatTemp(weather.temperature, unit)}</span>
           <span className={styles.iconWrap}>
-            <WeatherIcon icon={condition.icon} size={72} />
+            <WeatherIcon icon={condition.icon} size={82} />
           </span>
         </div>
         <p className={styles.condition}>{condition.label}</p>
