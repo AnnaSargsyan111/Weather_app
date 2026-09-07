@@ -2,7 +2,7 @@ import { getWeatherCondition } from "../../services/weatherCodes.js";
 import { formatTemp } from "../../utils/temperature.js";
 import { formatClockTime } from "../../utils/formatTime.js";
 import { buildWeatherInsight } from "../../utils/weatherInsight.js";
-import WeatherIcon from "../WeatherIcon/WeatherIcon.jsx";
+import AnimatedWeatherIcon from "../AnimatedWeatherIcon/AnimatedWeatherIcon.jsx";
 import styles from "./CurrentWeather.module.css";
 
 export default function CurrentWeather({ location, weather, unit, localTime, details }) {
@@ -20,7 +20,7 @@ export default function CurrentWeather({ location, weather, unit, localTime, det
         <div className={styles.tempRow}>
           <span className={styles.temp}>{formatTemp(weather.temperature, unit)}</span>
           <span className={styles.iconWrap}>
-            <WeatherIcon icon={condition.icon} size={82} />
+            <AnimatedWeatherIcon icon={condition.icon} size={82} />
           </span>
         </div>
         <p className={styles.condition}>{condition.label}</p>

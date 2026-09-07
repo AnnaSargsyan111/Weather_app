@@ -597,6 +597,60 @@ changes - verified programmatically across all 12 months in the rolling window
 (Sep 2026 - Aug 2027), including both Sunday-start months and the Saturday-start month
 (May 2027, the year's only 6-day leading case) and the 28-day month (Feb 2027).
 
+## AnimatedWeatherIcon (CurrentWeather's condition icon)
+
+[src/components/AnimatedWeatherIcon/](weather-app/src/components/AnimatedWeatherIcon/) -
+replaced the static react-icons `wi` icon in CurrentWeather. Built from scratch (there
+was no pre-existing "animated icon" to fix - CurrentWeather's icon had never animated;
+the earlier resize-to-82px request was just resizing the same static icon). React-icons'
+single-path glyphs can't have an independently-moving sun and cloud, so this is
+hand-rolled inline SVG instead, one `FAMILY[icon]` composition per condition key (reusing
+the same `condition.icon` values `weatherCodes.js` already produces - no new data path),
+animated purely via CSS `@keyframes`/`transform`/`opacity` in
+`AnimatedWeatherIcon.module.css` (`sun-rotate`+`sun-pulse`, `moon-glow`, `cloud-drift` /
+`cloud-glide`, `lightning-flash`, `rain-fall`, `snow-fall`, `fog-slide`/`wind-slide`) -
+no JS animation loop anywhere. `windy` exists as a built, working family (for
+completeness/testability) but is **not** wired to any live condition: Open-Meteo's
+`weather_code` has no standalone "windy" WMO category, so there's no real trigger for it
+today without fabricating one - would need to key off actual wind-speed data as a
+deliberate follow-up, not a silent override of the real precipitation condition.
+
+Two real rendering bugs turned up while verifying every state actually animates (not
+just that the code existed) - both invisible from reading the code, only caught by
+screenshotting each state:
+- **The night moon rendered nothing at all.** Its crescent was hand-computed as two SVG
+  arcs sharing one chord - fragile by construction, since an arc radius smaller than
+  half the chord length is geometrically impossible and silently produces a
+  degenerate/empty path rather than an error. Replaced with an SVG `<mask>` (a full
+  circle minus an offset "bite" circle via `useId()`-scoped mask id) - always valid
+  regardless of the numbers plugged in.
+- **partly-cloudy-night was structurally fine but still invisible**: the moon (no rays,
+  unlike the sun) was positioned to straddle the cloud's actual rendered top edge
+  (~y26 in the 0-100 viewBox, measured via `getBoundingClientRect()` - noticeably higher
+  than its path anchor points suggested by eye) and the crescent's visible "meat" was on
+  the side facing away from the exposed portion. Now positioned fully above that
+  measured edge instead of overlapping it.
+- **Fog/wind bands bled out of the icon and over the temperature text.** `.icon` had
+  `overflow: visible` (assumed necessary, copied reflexively - turned out nothing in
+  the set actually needs it) which defeated the seamless-scroll technique those two
+  families depend on: two duplicate bands slide across the viewBox and rely on
+  whatever's outside 0-100 being clipped away by the SVG's default overflow behavior.
+
+Verification method, since this environment's own introspection APIs turned out to be
+partly unreliable here: `getBBox()` returns `{}` unconditionally in this Browser pane
+regardless of whether an element is actually visible (not a real signal), and
+`getAnimations()[0].currentTime`/computed `transform` sampled twice inside one
+`await new Promise(setTimeout)` inside a single script often reads back unchanged even
+though the animation is genuinely running - this pane doesn't reliably tick its
+compositor between two reads in the same synchronous-looking script. What did work
+consistently: `document.hidden` must read `false` (front the tab, take one screenshot
+to force a real paint) before trusting any live measurement here (same rule already
+established elsewhere in this file for rAF/ResizeObserver); and comparing values across
+*separate* tool calls with a real `computer wait` in between, or just comparing two
+actual screenshots, gives trustworthy results. Every state was confirmed both ways -
+DOM/computed-style diffs across separate calls, and visual screenshots - not just
+"the CSS class is present."
+
 ## Roadmap ideas (not yet built)
 
 - Optional Google Maps mode behind a `VITE_GOOGLE_MAPS_API_KEY` env var, if Anna decides

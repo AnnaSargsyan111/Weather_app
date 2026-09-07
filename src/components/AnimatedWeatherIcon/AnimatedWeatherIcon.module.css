@@ -1,0 +1,226 @@
+.icon {
+  /* Default SVG clipping (overflow: hidden) is required, not incidental - the fog/wind
+     "seamless scroll" effect works by animating a duplicated pair of bands across the
+     viewBox and relying on whatever's outside 0-100 being clipped away. Every other
+     shape in this icon set already fits comfortably inside the viewBox on its own. */
+  display: block;
+}
+
+/* ---- Sun / rays (clear, partly-cloudy) ---- */
+
+.sunRotate {
+  animation: sun-rotate 18s linear infinite;
+}
+
+.sunPulse {
+  animation: sun-pulse 3s ease-in-out infinite;
+}
+
+@keyframes sun-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sun-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+
+/* ---- Moon glow (clear-night, partly-cloudy-night) ---- */
+
+.moonGlow {
+  animation: moon-glow 4s ease-in-out infinite;
+}
+
+@keyframes moon-glow {
+  0%,
+  100% {
+    opacity: 0.82;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+/* ---- Cloud ---- */
+
+.cloud {
+  opacity: 0.95;
+}
+
+/* Idle state (cloudy, rain, snow, sleet, thunderstorm) - a small continuous drift so
+   the icon is never fully static, without implying it's passing in front of anything. */
+.cloudDrift {
+  animation: cloud-drift 8s ease-in-out infinite;
+}
+
+@keyframes cloud-drift {
+  0%,
+  100% {
+    transform: translateX(-2px);
+  }
+  50% {
+    transform: translateX(2px);
+  }
+}
+
+/* partly-cloudy: glides across the sun/moon and back, per spec. */
+.cloudGlide {
+  animation: cloud-glide 7s ease-in-out infinite;
+}
+
+@keyframes cloud-glide {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(9px);
+  }
+}
+
+/* ---- Lightning (thunderstorm) ---- */
+
+.lightningFlash {
+  animation: lightning-flash 2.6s ease-in-out infinite;
+}
+
+@keyframes lightning-flash {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  3% {
+    opacity: 1;
+  }
+  7% {
+    opacity: 0.15;
+  }
+  11% {
+    opacity: 1;
+  }
+  18% {
+    opacity: 0;
+  }
+}
+
+/* ---- Precipitation (rain, snow, sleet) ---- */
+
+.precip {
+  overflow: visible;
+}
+
+.rainDrop {
+  opacity: 0;
+  animation-name: rain-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes rain-fall {
+  0% {
+    transform: translateY(-6px);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+}
+
+.snowFlake {
+  opacity: 0;
+  animation-name: snow-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  transform-origin: center;
+}
+
+@keyframes snow-fall {
+  0% {
+    transform: translate(0, -4px);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(3px, 12px);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-2px, 26px);
+    opacity: 0;
+  }
+}
+
+/* ---- Fog / mist ---- */
+
+.fogTrack {
+  animation-name: fog-slide;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes fog-slide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100px);
+  }
+}
+
+/* ---- Wind (built for completeness, not yet wired to a live condition) ---- */
+
+.windTrack {
+  animation-name: wind-slide;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes wind-slide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sunRotate,
+  .sunPulse,
+  .moonGlow,
+  .cloudDrift,
+  .cloudGlide,
+  .lightningFlash,
+  .rainDrop,
+  .snowFlake,
+  .fogTrack,
+  .windTrack {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
