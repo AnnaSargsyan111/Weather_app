@@ -46,24 +46,31 @@ export default function ForecastGrid({ month, previousMonth, nextMonth, unit, fi
 
   return (
     <div className={styles.gridPanel}>
-      <div className={styles.weekdayRow}>
-        {WEEKDAY_LABELS.map((label) => (
-          <span key={label} className={styles.weekdayLabel}>
-            {label}
-          </span>
-        ))}
-      </div>
-      <div className={styles.grid}>
-        {cells.map(({ day, isAdjacent }, index) => (
-          <ForecastDayCell
-            key={day?.date ?? `pad-${index}`}
-            day={day}
-            unit={unit}
-            isAdjacent={isAdjacent}
-            isToday={day && !isAdjacent && isSameDate(day.date)}
-            matchesFilter={!isAdjacent && filter !== "all" && day && matchesFilter(day, filter)}
-          />
-        ))}
+      {/* Weekday labels and day cells scroll together as one unit on narrow screens -
+          each column IS a specific weekday, so shrinking to fewer columns (like the
+          metrics/details grids do) would misrepresent the calendar rather than just
+          look cramped. Below a minimum legible column width, this scrolls horizontally
+          instead, the same pattern the location-chip row already uses. */}
+      <div className={styles.scrollArea}>
+        <div className={styles.weekdayRow}>
+          {WEEKDAY_LABELS.map((label) => (
+            <span key={label} className={styles.weekdayLabel}>
+              {label}
+            </span>
+          ))}
+        </div>
+        <div className={styles.grid}>
+          {cells.map(({ day, isAdjacent }, index) => (
+            <ForecastDayCell
+              key={day?.date ?? `pad-${index}`}
+              day={day}
+              unit={unit}
+              isAdjacent={isAdjacent}
+              isToday={day && !isAdjacent && isSameDate(day.date)}
+              matchesFilter={!isAdjacent && filter !== "all" && day && matchesFilter(day, filter)}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

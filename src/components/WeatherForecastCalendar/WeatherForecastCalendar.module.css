@@ -147,6 +147,14 @@
   padding: 18px;
 }
 
+/* Only actually scrolls once .weekdayRow/.grid's own minmax() floor (set in the mobile
+   media query below) makes their natural width exceed this container's - harmless no-op
+   at wider widths, where the 1fr columns already shrink to fit without a floor. */
+.scrollArea {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .weekdayRow {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -312,5 +320,13 @@
   }
   .cellMax {
     font-size: 12px;
+  }
+  /* Below this width, 7 equal-fraction columns get too narrow to fit the weekday,
+     date, icon, and both temperatures without overlapping (confirmed: cells shrank to
+     ~37px at 375px wide before this, with adjacent days' temperatures visibly
+     overlapping). A 60px floor keeps every cell legible; .scrollArea handles the rest. */
+  .weekdayRow,
+  .grid {
+    grid-template-columns: repeat(7, minmax(60px, 1fr));
   }
 }

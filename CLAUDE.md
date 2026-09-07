@@ -718,6 +718,25 @@ night, but the gap itself predates this change and isn't something `--color-bg`/
 token overrides can fix without touching `WeatherAtmosphere`'s own sizing - which the
 task explicitly said not to do.
 
+## Forecast calendar mobile overlap: scroll, don't shrink columns
+
+At narrow widths (confirmed at 375px), the 7-day grid's `repeat(7, minmax(0, 1fr))`
+columns shrank to ~37px each - too narrow for weekday + date + icon + two temperatures,
+so adjacent days' numbers visibly overlapped. Unlike the metrics/details grids (which
+drop from 5/4 columns down to 3/2/1 on narrow screens), this grid can't just reduce its
+column count - each column IS a specific weekday (Sun-Sat), so a full-page audit found
+this specific issue and confirmed the right fix: below `640px`, `.weekdayRow`/`.grid`
+get a `minmax(60px, 1fr)` floor instead of `minmax(0, 1fr)`, and both are now wrapped in
+one shared `.scrollArea` (`overflow-x: auto`) in [ForecastGrid.jsx](weather-app/src/components/WeatherForecastCalendar/ForecastGrid.jsx)
+so they scroll together as a single unit once 7 legible columns no longer fit - the same
+horizontal-scroll pattern the location-chip row already uses elsewhere in the app, not a
+new one. Desktop/tablet are untouched (still `minmax(0, 1fr)`, never scrollable).
+
+Same full-page mobile audit also found the floating `SideNav` dots rail overlapping and
+clipping the first 1-2 characters of text on most section headers/cards at mobile widths
+(e.g. "Overcast" -> "vercast", "What to Wear Today" -> "hat to Wear Today") - confirmed,
+reported, but intentionally left unfixed (not selected for this pass).
+
 ## Roadmap ideas (not yet built)
 
 - Optional Google Maps mode behind a `VITE_GOOGLE_MAPS_API_KEY` env var, if Anna decides
