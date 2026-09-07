@@ -686,6 +686,38 @@ actual screenshots, gives trustworthy results. Every state was confirmed both wa
 DOM/computed-style diffs across separate calls, and visual screenshots - not just
 "the CSS class is present."
 
+## Night + Light theme card override (`[data-night-light]`)
+
+One specific combination - app theme set to **Light** while it's genuinely **nighttime**
+at the active location - forces every card (hero, metrics, What to Wear, details,
+forecast, overview, climate/daily-summary, news, search bar, header tabs) to one unified
+solid dark background (`#1e293b`) with high-contrast text (`#ffffff` primary, `#cbd5e1`
+secondary), instead of the normal pale light-theme surfaces. Implemented as a single
+CSS-variable override block in [index.css](weather-app/src/index.css) scoped to
+`:root[data-night-light="true"]`, redefining `--color-surface`, `--color-surface-hover`,
+`--color-bg-elevated`, `--color-border[-strong]`, `--color-text[-secondary/-tertiary]`,
+and `--glass-bg`/`--glass-border` - not per-component overrides. Every one of the listed
+cards already pulled its background from `--glass-bg` or `--color-surface` and its text
+from the `--color-text*` tokens (confirmed by reading every relevant CSS file before
+implementing), so this one block covers all of them with zero component edits.
+Deliberately does **not** touch `--color-bg` (the app/body background), `--color-accent`,
+or `WeatherAtmosphere` itself - the animated sky stays exactly as it already renders for
+real nighttime, per the explicit requirement not to touch it. `App.jsx` sets the
+`data-night-light` attribute on `<html>` in a small `useEffect` keyed off
+`theme === "light" && scene?.isNight` - `scene.isNight` is the same signal
+`WeatherAtmosphere` already uses for its own night rendering, so the card override and
+the background's night look always agree about what "night" means.
+
+Found and deliberately left alone while testing this (out of scope, pre-existing,
+confirmed unrelated - reproduces identically in plain Dark theme too): `WeatherAtmosphere`
+is `position: fixed` with a height bound to one viewport (~683px in one measured case),
+not the full scrollable page (~5472px in that same case) - scrolling past it reveals the
+raw `<body>` background (`--color-bg`) behind the cards for the rest of the page. This is
+far more visible now that dark cards can sit on a light-theme's pale `--color-bg` at
+night, but the gap itself predates this change and isn't something `--color-bg`/text
+token overrides can fix without touching `WeatherAtmosphere`'s own sizing - which the
+task explicitly said not to do.
+
 ## Roadmap ideas (not yet built)
 
 - Optional Google Maps mode behind a `VITE_GOOGLE_MAPS_API_KEY` env var, if Anna decides

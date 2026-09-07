@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Header from "./components/Header/Header.jsx";
 import CurrentWeather from "./components/CurrentWeather/CurrentWeather.jsx";
 import WeatherMetrics from "./components/WeatherMetrics/WeatherMetrics.jsx";
@@ -38,6 +38,19 @@ export default function App() {
   const { articles: newsArticles, loading: newsLoading, error: newsError } = useWeatherNews();
   const [geoError, setGeoError] = useState(null);
   const scene = useAtmosphereScene(weather);
+  // Light theme + real nighttime is the one combination where every card gets forced to
+  // a unified solid dark background with high-contrast text (see index.css's
+  // [data-night-light] block) instead of the normal light-theme surfaces - the animated
+  // sky background itself is untouched, only what the cards render on top of it. Tied to
+  // the same `scene.isNight` the background already uses, so the override activates
+  // exactly when the background is actually showing its night look.
+  useEffect(() => {
+    if (theme === "light" && scene?.isNight) {
+      document.documentElement.setAttribute("data-night-light", "true");
+    } else {
+      document.documentElement.removeAttribute("data-night-light");
+    }
+  }, [theme, scene?.isNight]);
   // Single source of truth for "the current local time at this location" - shared by
   // CurrentWeather and WeatherDetailsSection so they can never show two different times.
   const localTime = useLocalClock(weather?.timezone);

@@ -83,6 +83,29 @@ body {
   --glass-border: rgba(255, 255, 255, 0.14);
 }
 
+/* Light theme + real nighttime: every card is forced to one unified solid dark
+   background with high-contrast text instead of the normal light-theme surfaces - the
+   pale light-theme cards read poorly against the animated sky's actual night look,
+   which this does NOT touch (--color-bg, the atmosphere background, and --color-accent
+   are all deliberately left alone). Set on <html> by App.jsx whenever theme is "light"
+   and the real current-location time is night (same signal WeatherAtmosphere itself
+   uses for its night look). Border/glass values reuse the app's own existing dark-theme
+   tokens above rather than introducing new ones. */
+:root[data-night-light="true"] {
+  --color-surface: #1e293b;
+  --color-surface-hover: #28303d;
+  --color-bg-elevated: #1e293b;
+  --color-border: #2e333f;
+  --color-border-strong: #3b4150;
+
+  --color-text: #ffffff;
+  --color-text-secondary: #cbd5e1;
+  --color-text-tertiary: #cbd5e1;
+
+  --glass-bg: #1e293b;
+  --glass-border: rgba(255, 255, 255, 0.14);
+}
+
 body {
   font-family: var(--font-sans);
   background-color: var(--color-bg);
