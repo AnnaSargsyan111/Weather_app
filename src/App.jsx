@@ -92,6 +92,7 @@ export default function App() {
                     unit={unit}
                     localTime={localTime}
                     details={details}
+                    scene={scene}
                   />
                 ) : null}
               </div>

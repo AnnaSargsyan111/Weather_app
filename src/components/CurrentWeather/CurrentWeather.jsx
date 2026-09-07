@@ -5,7 +5,7 @@ import { buildWeatherInsight } from "../../utils/weatherInsight.js";
 import AnimatedWeatherIcon from "../AnimatedWeatherIcon/AnimatedWeatherIcon.jsx";
 import styles from "./CurrentWeather.module.css";
 
-export default function CurrentWeather({ location, weather, unit, localTime, details }) {
+export default function CurrentWeather({ location, weather, unit, localTime, details, scene }) {
   const condition = getWeatherCondition(weather.weatherCode, weather.isDay);
   const insight = buildWeatherInsight(details, condition, weather);
 
@@ -20,7 +20,7 @@ export default function CurrentWeather({ location, weather, unit, localTime, det
         <div className={styles.tempRow}>
           <span className={styles.temp}>{formatTemp(weather.temperature, unit)}</span>
           <span className={styles.iconWrap}>
-            <AnimatedWeatherIcon icon={condition.icon} size={82} />
+            <AnimatedWeatherIcon weather={weather} scene={scene} />
           </span>
         </div>
         <p className={styles.condition}>{condition.label}</p>

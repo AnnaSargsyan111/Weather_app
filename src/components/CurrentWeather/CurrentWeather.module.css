@@ -38,13 +38,13 @@
 }
 
 .iconWrap {
-  color: var(--color-accent);
   display: flex;
   align-items: center;
-  /* Deliberate nudge, not just the tempRow gap - the larger icon (82px, up from 72px)
-     needs a touch more breathing room from the temperature to read as intentional
-     spacing rather than the number and icon crowding each other. */
-  margin-left: 6px;
+  /* AnimatedWeatherIcon carries its own fixed palette now, not currentColor, so this
+     wrapper only handles position - a further ~10px nudge on top of tempRow's own 16px
+     gap (was already +6px from an earlier pass), landing in the requested 8-12px range
+     of extra rightward movement from where the icon sits today. */
+  margin-left: 16px;
 }
 
 .condition {

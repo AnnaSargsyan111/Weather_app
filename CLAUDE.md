@@ -600,41 +600,76 @@ changes - verified programmatically across all 12 months in the rolling window
 ## AnimatedWeatherIcon (CurrentWeather's condition icon)
 
 [src/components/AnimatedWeatherIcon/](weather-app/src/components/AnimatedWeatherIcon/) -
-replaced the static react-icons `wi` icon in CurrentWeather. Built from scratch (there
-was no pre-existing "animated icon" to fix - CurrentWeather's icon had never animated;
-the earlier resize-to-82px request was just resizing the same static icon). React-icons'
-single-path glyphs can't have an independently-moving sun and cloud, so this is
-hand-rolled inline SVG instead, one `FAMILY[icon]` composition per condition key (reusing
-the same `condition.icon` values `weatherCodes.js` already produces - no new data path),
-animated purely via CSS `@keyframes`/`transform`/`opacity` in
-`AnimatedWeatherIcon.module.css` (`sun-rotate`+`sun-pulse`, `moon-glow`, `cloud-drift` /
-`cloud-glide`, `lightning-flash`, `rain-fall`, `snow-fall`, `fog-slide`/`wind-slide`) -
-no JS animation loop anywhere. `windy` exists as a built, working family (for
-completeness/testability) but is **not** wired to any live condition: Open-Meteo's
-`weather_code` has no standalone "windy" WMO category, so there's no real trigger for it
-today without fabricating one - would need to key off actual wind-speed data as a
-deliberate follow-up, not a silent override of the real precipitation condition.
+a premium, layered 2D illustration system replacing the earlier flat single-accent-color
+version (which itself replaced a static react-icons glyph - see git history for that
+first pass). Deliberately its own fixed color language (`weatherIconPalette.js` - warm
+sun yellows, cool moon/cloud grays, blue rain, white snow, etc.), independent of
+`--color-accent`, unlike every other icon in the app - a one-time confirmed exception,
+a "hero" illustration rather than a themed glyph. Fixed size, not fluid: 84px desktop /
+72px mobile via a CSS media query on `.root` in `AnimatedWeatherIcon.module.css`, not a
+JS-computed prop - `CurrentWeather.jsx` no longer passes a `size` at all.
 
-Two real rendering bugs turned up while verifying every state actually animates (not
-just that the code existed) - both invisible from reading the code, only caught by
-screenshotting each state:
-- **The night moon rendered nothing at all.** Its crescent was hand-computed as two SVG
-  arcs sharing one chord - fragile by construction, since an arc radius smaller than
-  half the chord length is geometrically impossible and silently produces a
-  degenerate/empty path rather than an error. Replaced with an SVG `<mask>` (a full
-  circle minus an offset "bite" circle via `useId()`-scoped mask id) - always valid
-  regardless of the numbers plugged in.
+**Shared weather state, not a second condition system**:
+[weatherIconState.js](weather-app/src/components/AnimatedWeatherIcon/weatherIconState.js)'s
+`resolveWeatherIconState(weather, scene)` takes the exact same `scene` object
+`useAtmosphereScene()` already produces for the dynamic background (passed down
+`App.jsx` -> `CurrentWeather` -> `AnimatedWeatherIcon` as a new `scene` prop) - so the
+icon and the background can never disagree about current wind/precipitation/cloud state,
+by construction. Every threshold reuses one already established elsewhere in the app
+rather than inventing a new one: the "windy" family (now actually wired to real data,
+unlike the previous pass) triggers at Beaufort force 6 (>38 km/h, `STRONG_WIND_KMH`),
+the same cutoff the Wind detail card already uses (`weatherDetailsHelpers.js`); rain's
+wind-driven lean uses the *exact* `rainLean = -1 + windLean * 0.25` formula
+`PrecipitationCanvas.jsx` computes for the background's own rain streaks, not a fresh
+trig calculation that happens to also use wind. Precipitation always takes priority in
+family resolution, so "rain + strong wind" stays the rain family (faster fall, more
+lean) rather than incorrectly falling through to the wind family.
+
+Still no JS animation loop - every motion is CSS `@keyframes`/`transform`/`opacity`
+(`sun-rotate`+`sun-pulse`, `moon-glow`, `cloud-drift`/`cloud-glide`/`cloud-sway`,
+`lightning-flash`, `rain-fall`, `snow-fall`, `fog-slide`, `wind-slide`). Real wind still
+reaches the keyframes themselves, not just JS-side branching: `--wind-lean`/`--rain-lean`/
+`--wind-dir` are set as CSS custom properties on the SVG root and read inside `calc()` in
+the rain-skew and snow-drift keyframes directly. `--wind-dir` is a separate, always
+`+1`/`-1` value (never the raw `windLean`, which can land near 0 for a due-north/south
+wind even at high speed) - driving the wind family's translateX sign off raw `windLean`
+would visibly stall the animation on those headings. Night (`weather.isDay === false`)
+applies a single `saturate(0.82) brightness(0.9)` CSS filter to every family except
+clear/partly-cloudy, which already branch to a dedicated moon composition with its own
+tuned colors - deliberately not a second palette per family, per how the app already
+prefers adapting contrast/opacity over redesigning a whole visual system for night.
+`prefers-reduced-motion` gives each animated class an explicit resting frame (e.g.
+lightning frozen at 0.55 opacity, not wherever a near-zero-duration animation happens to
+land) rather than just capping duration to near-zero.
+
+Bugs found, one class caught by self-review before ever rendering, the rest only by
+actually rendering each state:
+- **Caught before the first build, by re-reading the draft**: `Cloud`/`RainDrops` build
+  their gradient `fill` from a per-instance `uid` (`useId()`, so multiple icons on a page
+  never collide over the same `<linearGradient id>`), but most `FAMILY[...]`
+  compositions were originally written as `<Cloud uid={undefined} />` - which would have
+  resolved to `fill="url(#undefined-cloud-light)"`, an SVG `url()` reference to a
+  nonexistent id, silently rendering as `fill: none` rather than an error. Same class of
+  bug as the `-0`/arc-math gotchas below: a broken *reference* rather than broken
+  *geometry*, and just as invisible from a glance - worth a second, deliberate read of
+  any component that threads a generated id through several call sites, not just a
+  build-and-see check.
+- **The night moon rendered nothing at all** (this one only showed up on screenshot). Its crescent was hand-computed as two SVG
+  arcs sharing one chord - an arc radius smaller than half the chord length is
+  geometrically impossible and silently produces a degenerate/empty path rather than an
+  error. Fixed with an SVG `<mask>` (a full circle minus an offset "bite" circle,
+  `useId()`-scoped) - always valid regardless of the numbers plugged in.
 - **partly-cloudy-night was structurally fine but still invisible**: the moon (no rays,
   unlike the sun) was positioned to straddle the cloud's actual rendered top edge
   (~y26 in the 0-100 viewBox, measured via `getBoundingClientRect()` - noticeably higher
-  than its path anchor points suggested by eye) and the crescent's visible "meat" was on
+  than its path anchor points suggested by eye), with the crescent's visible "meat" on
   the side facing away from the exposed portion. Now positioned fully above that
-  measured edge instead of overlapping it.
+  measured edge.
 - **Fog/wind bands bled out of the icon and over the temperature text.** `.icon` had
-  `overflow: visible` (assumed necessary, copied reflexively - turned out nothing in
-  the set actually needs it) which defeated the seamless-scroll technique those two
-  families depend on: two duplicate bands slide across the viewBox and rely on
-  whatever's outside 0-100 being clipped away by the SVG's default overflow behavior.
+  `overflow: visible` (nothing in the set actually needs it) which defeated the
+  seamless-scroll technique those two families depend on: two duplicate bands slide
+  across the viewBox and rely on whatever's outside 0-100 being clipped by the SVG's
+  default overflow behavior.
 
 Verification method, since this environment's own introspection APIs turned out to be
 partly unreliable here: `getBBox()` returns `{}` unconditionally in this Browser pane

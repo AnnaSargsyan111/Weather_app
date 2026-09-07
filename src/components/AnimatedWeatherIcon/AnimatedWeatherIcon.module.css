@@ -1,19 +1,47 @@
-.icon {
-  /* Default SVG clipping (overflow: hidden) is required, not incidental - the fog/wind
-     "seamless scroll" effect works by animating a duplicated pair of bands across the
-     viewBox and relying on whatever's outside 0-100 being clipped away. Every other
-     shape in this icon set already fits comfortably inside the viewBox on its own. */
-  display: block;
+/* Fixed visual size, not fluid - 84px desktop, 72px mobile. The container's box never
+   changes size when the animation runs (everything inside animates via transform/opacity
+   only), so there's no layout shift and no reflow cost. */
+.root {
+  width: 84px;
+  height: 84px;
+  flex: none;
 }
 
-/* ---- Sun / rays (clear, partly-cloudy) ---- */
+@media (max-width: 640px) {
+  .root {
+    width: 72px;
+    height: 72px;
+  }
+}
+
+.icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Default SVG clipping (not overflow: visible) is required, not incidental - the
+     fog/wind "seamless scroll" effect relies on whatever's outside the 0-100 viewBox
+     being clipped away. Every shape in this set already fits inside the viewBox. */
+}
+
+/* Night: cooler, softer, not just darker - reduces saturation/brightness slightly for
+   every family except clear/partly-cloudy, which already branch to a dedicated moon
+   composition with its own tuned colors instead of a filter. */
+.night {
+  filter: saturate(0.82) brightness(0.9);
+}
+
+/* ---- Sun ---- */
 
 .sunRotate {
-  animation: sun-rotate 18s linear infinite;
+  animation: sun-rotate 20s linear infinite;
 }
 
 .sunPulse {
-  animation: sun-pulse 3s ease-in-out infinite;
+  animation: sun-pulse 3.4s ease-in-out infinite;
+}
+
+.sunCore {
+  filter: drop-shadow(0 2px 4px rgba(245, 184, 46, 0.35));
 }
 
 @keyframes sun-rotate {
@@ -29,40 +57,39 @@
   0%,
   100% {
     transform: scale(1);
-    opacity: 0.85;
+    opacity: 0.9;
   }
   50% {
-    transform: scale(1.12);
+    transform: scale(1.1);
     opacity: 1;
   }
 }
 
-/* ---- Moon glow (clear-night, partly-cloudy-night) ---- */
+/* ---- Moon ---- */
 
 .moonGlow {
-  animation: moon-glow 4s ease-in-out infinite;
+  animation: moon-glow 4.2s ease-in-out infinite;
+  filter: drop-shadow(0 2px 3px rgba(184, 194, 209, 0.4));
 }
 
 @keyframes moon-glow {
   0%,
   100% {
-    opacity: 0.82;
+    opacity: 0.85;
     transform: scale(1);
   }
   50% {
     opacity: 1;
-    transform: scale(1.04);
+    transform: scale(1.035);
   }
 }
 
 /* ---- Cloud ---- */
 
-.cloud {
-  opacity: 0.95;
+.cloudGroup {
+  filter: drop-shadow(0 3px 4px rgba(52, 59, 71, 0.22));
 }
 
-/* Idle state (cloudy, rain, snow, sleet, thunderstorm) - a small continuous drift so
-   the icon is never fully static, without implying it's passing in front of anything. */
 .cloudDrift {
   animation: cloud-drift 8s ease-in-out infinite;
 }
@@ -77,9 +104,8 @@
   }
 }
 
-/* partly-cloudy: glides across the sun/moon and back, per spec. */
 .cloudGlide {
-  animation: cloud-glide 7s ease-in-out infinite;
+  animation: cloud-glide 7.5s ease-in-out infinite;
 }
 
 @keyframes cloud-glide {
@@ -92,7 +118,21 @@
   }
 }
 
-/* ---- Lightning (thunderstorm) ---- */
+.cloudSway {
+  animation: cloud-sway 2.4s ease-in-out infinite;
+}
+
+@keyframes cloud-sway {
+  0%,
+  100% {
+    transform: translateX(-1.5px);
+  }
+  50% {
+    transform: translateX(1.5px);
+  }
+}
+
+/* ---- Lightning ---- */
 
 .lightningFlash {
   animation: lightning-flash 2.6s ease-in-out infinite;
@@ -100,27 +140,44 @@
 
 @keyframes lightning-flash {
   0%,
+  16%,
+  50%,
   100% {
     opacity: 0;
   }
-  3% {
+  2% {
     opacity: 1;
   }
-  7% {
+  5% {
+    opacity: 0.25;
+  }
+  8% {
+    opacity: 0.95;
+  }
+  53% {
+    opacity: 0.85;
+  }
+  57% {
     opacity: 0.15;
   }
-  11% {
+  60% {
     opacity: 1;
-  }
-  18% {
-    opacity: 0;
   }
 }
 
-/* ---- Precipitation (rain, snow, sleet) ---- */
+/* ---- Rain ---- */
 
 .precip {
   overflow: visible;
+}
+
+/* Skew, not rotate - keeps each drop's own vertical fall animation untouched while
+   still visually leaning the whole rain field. Angle matches the dynamic background's
+   own rain-lean constant (rainLean * 14, see PrecipitationCanvas.jsx / weatherIconState.js)
+   so the icon and the background never disagree about which way the rain is blowing. */
+.rainLean {
+  transform: skewX(calc(var(--rain-lean, -1) * 14deg));
+  transform-origin: 50px 66px;
 }
 
 .rainDrop {
@@ -147,6 +204,8 @@
   }
 }
 
+/* ---- Snow ---- */
+
 .snowFlake {
   opacity: 0;
   animation-name: snow-fall;
@@ -164,18 +223,20 @@
     opacity: 1;
   }
   50% {
-    transform: translate(3px, 12px);
+    /* Real wind drift, not a fixed sway - matches how the dynamic background's own
+       snow particles respond to windLean (see PrecipitationCanvas.jsx). */
+    transform: translate(calc(var(--wind-lean, 0) * 6px), 12px);
   }
   85% {
     opacity: 1;
   }
   100% {
-    transform: translate(-2px, 26px);
+    transform: translate(calc(var(--wind-lean, 0) * 10px), 26px);
     opacity: 0;
   }
 }
 
-/* ---- Fog / mist ---- */
+/* ---- Fog ---- */
 
 .fogTrack {
   animation-name: fog-slide;
@@ -192,7 +253,7 @@
   }
 }
 
-/* ---- Wind (built for completeness, not yet wired to a live condition) ---- */
+/* ---- Wind ---- */
 
 .windTrack {
   animation-name: wind-slide;
@@ -205,22 +266,40 @@
     transform: translateX(0);
   }
   to {
-    transform: translateX(-100px);
+    /* --wind-dir is always +1/-1 (never 0, unlike raw windLean, which can land near 0
+       for a due-north/south wind even at high speed) - see AnimatedWeatherIcon.jsx. */
+    transform: translateX(calc(var(--wind-dir, 1) * -100px));
   }
 }
 
+/* Reduced motion: each animation gets an explicit, sensible resting frame instead of
+   just freezing wherever a near-zero duration happens to land (which could freeze
+   lightning mid-flash or rain half-fallen) - the illustration itself must stay intact,
+   only the continuous motion goes away. */
 @media (prefers-reduced-motion: reduce) {
   .sunRotate,
   .sunPulse,
   .moonGlow,
   .cloudDrift,
   .cloudGlide,
-  .lightningFlash,
-  .rainDrop,
-  .snowFlake,
+  .cloudSway,
   .fogTrack,
   .windTrack {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
+    animation: none;
+  }
+
+  .lightningFlash {
+    animation: none;
+    opacity: 0.55;
+  }
+
+  .rainDrop {
+    animation: none;
+    opacity: 0.85;
+  }
+
+  .snowFlake {
+    animation: none;
+    opacity: 1;
   }
 }
