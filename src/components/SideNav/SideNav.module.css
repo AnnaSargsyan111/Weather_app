@@ -99,9 +99,23 @@
 @media (max-width: 720px) {
   .rail {
     left: 8px;
+    /* Anchored to the vertical center (top: 50%) like desktop, the expanded panel
+       (up to 420px tall) grows upward as much as downward - on a typical mobile
+       viewport height that pushes its top items underneath the sticky Header (z-index
+       1050, above this rail's 900), visually and functionally covering "Current" and
+       "Weather details" so they can't be tapped. Anchoring to the bottom instead keeps
+       the whole expanded panel below the header regardless of expanded height. */
+    top: auto;
+    bottom: 24px;
+    transform: none;
   }
 
   .rail.expanded {
     width: 190px;
+    /* Safety net for very short viewports where even bottom-anchored the panel doesn't
+       fully fit above the 24px bottom offset - scrolls internally instead of clipping
+       (and hiding) the lowest items, the same failure mode this is fixing at the top. */
+    max-height: min(420px, calc(100vh - 96px));
+    overflow-y: auto;
   }
 }

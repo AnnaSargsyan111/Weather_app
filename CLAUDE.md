@@ -735,7 +735,26 @@ new one. Desktop/tablet are untouched (still `minmax(0, 1fr)`, never scrollable)
 Same full-page mobile audit also found the floating `SideNav` dots rail overlapping and
 clipping the first 1-2 characters of text on most section headers/cards at mobile widths
 (e.g. "Overcast" -> "vercast", "What to Wear Today" -> "hat to Wear Today") - confirmed,
-reported, but intentionally left unfixed (not selected for this pass).
+reported, initially left unfixed.
+
+**Follow-up, now fixed**: a related but more serious symptom of the same root cause -
+`SideNav`'s desktop positioning (`position: fixed; top: 50%; transform: translateY(-50%)`)
+reused as-is on mobile - turned out to make the *expanded* panel (up to 420px tall,
+growing symmetrically up/down from center) push its top items underneath the sticky
+`Header` (`z-index: 1050` vs. the rail's `900`) on typical mobile viewport heights,
+visually and functionally covering "Current" and "Weather details" so they couldn't be
+tapped at all - not just a cosmetic overlap like the collapsed-pill case. Fixed by
+bottom-anchoring `.rail` on mobile only (`top: auto; bottom: 24px`, `@media (max-width:
+720px)` in [SideNav.module.css](weather-app/src/components/SideNav/SideNav.module.css))
+so the expanded panel always grows upward from a fixed floor, never into the header,
+regardless of expanded height; added `max-height: min(420px, calc(100vh - 96px))` +
+`overflow-y: auto` on the expanded state as a safety net for very short viewports where
+even bottom-anchored it might not fully fit. Desktop is untouched (still center-anchored).
+This incidentally also moves the *collapsed* pill's resting position off dead-center for
+mobile, which reduces but doesn't eliminate the earlier-reported text-clipping overlap
+(a 40px pill occasionally sitting over scrolled text near the bottom-left corner now,
+instead of the vertical center) - no longer blocks any functionality, but still cosmetic
+and still open if wanted.
 
 ## Roadmap ideas (not yet built)
 
