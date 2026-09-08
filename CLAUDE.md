@@ -816,6 +816,42 @@ reads `--glass-bg` unchanged, and desktop's header keeps its original translucen
 header's own dropdowns (`ThemeSelector`, the °C/°F menu) already used the fully opaque
 `--color-surface` token, not `--glass-bg`, so they were never part of this bug.
 
+## Header mobile compaction: `.chipRow`, and the nested-flex min-width trap
+
+Mobile header used to stack as 4 full-width rows (search / current-location button
+alone / location chips / Theme+°C+environment controls). Compacted to 3 by grouping
+`CurrentLocationButton` with the chips onto one shared row in
+[Header.jsx](weather-app/src/components/Header/Header.jsx) - wrapped in a new
+`.chipRow` div, `display: contents` by default so it's invisible to desktop's layout
+(both children sit exactly where they always did, directly in `.left`'s own row) and
+only becomes a real `display: flex` row inside the existing `@media (max-width: 640px)`
+block in [Header.module.css](weather-app/src/components/Header/Header.module.css) -
+desktop is untouched (verified: `.chipRow` computes to `display: contents` and the
+header's background is still the original unmodified `rgba(20, 22, 28, 0.45)` above
+640px).
+
+Getting `.locations` to actually scroll instead of overflowing needed more than the
+`flex: 1; min-width: 0` that normally fixes "flex child won't shrink below its content"
+- `.chipRow` itself is *also* a flex item (inside `.left`'s column) as well as *being* a
+flex container, and even with `min-width: 0` set directly on it, its rendered width
+still expanded to fit all the chips unwrapped (measured: 757px inside a 288px-wide
+parent) rather than being capped by `.left`'s `align-items: stretch`. Root cause wasn't
+fully diagnosed (plausibly a stretch/cross-axis quirk specific to a flex item that's
+itself a flex formatting context), but the fix is simple and robust either way: give
+`.chipRow` an explicit `width: 100%` rather than relying on stretch alone. Confirmed
+fixed the deterministic way, not by eyeballing a screenshot: set `.locations.scrollLeft`
+directly and read it back - it stayed `0` (proving no real overflow existed) before the
+`width: 100%` fix, and held the requested value after.
+
+Also confirmed in this session: `window.innerWidth` and `getBoundingClientRect()` can
+disagree with what's actually rendered/scrollable in this Browser pane under certain
+resize-emulation states (seen reporting a stale ~773-775px width on tabs that were
+visibly, confirmably narrow by every other signal - screenshot content, `.chipRow`'s own
+computed `display`, and `.left`'s computed `width`). When these tools disagree with each
+other, trust a behavioral test over a geometry read: setting `scrollLeft` and reading it
+back, or comparing `scrollWidth`/`clientWidth` on the specific element in question, over
+`window.innerWidth` specifically.
+
 ## Roadmap ideas (not yet built)
 
 - Optional Google Maps mode behind a `VITE_GOOGLE_MAPS_API_KEY` env var, if Anna decides

@@ -25,6 +25,14 @@
   min-width: 0;
 }
 
+/* display: contents on desktop (default) - invisible to layout, so
+   CurrentLocationButton and .locations sit directly in .left's own row exactly as
+   before this wrapper existed. Only becomes a real flex row on mobile (see media
+   query below), where it groups them into one compact row together. */
+.chipRow {
+  display: contents;
+}
+
 .locations {
   display: flex;
   align-items: center;
@@ -61,8 +69,27 @@
     align-items: stretch;
   }
 
-  .locations {
+  /* Real row now, not display: contents - groups the current-location button with the
+     chips so they share one compact row instead of each taking its own full-width row.
+     min-width: 0 is required, not decorative - .chipRow is itself a flex item inside
+     .left's column, so without it, its automatic minimum size defaults to its content's
+     full min-content width (button + every chip unwrapped), which then overrides
+     .locations' own min-width: 0 from the outside and defeats the scroll-instead-of-
+     overflow behavior entirely. */
+  .chipRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     width: 100%;
+    min-width: 0;
+  }
+
+  .locations {
+    /* Was width: 100% when this was its own row - now it shares the row with the
+       current-location button, so it takes the remaining space instead and keeps
+       scrolling internally rather than wrapping/overflowing next to the button. */
+    flex: 1;
+    min-width: 0;
   }
 
   .header {

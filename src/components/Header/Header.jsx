@@ -23,21 +23,27 @@ export default function Header({
     <header className={styles.header}>
       <div className={styles.left}>
         <LocationSearch onSelect={onAddLocation} />
-        <CurrentLocationButton onLocate={onAddLocation} onError={onGeoError} />
-        {locations.length > 0 && (
-          <div className={styles.locations}>
-            {locations.map((location) => (
-              <LocationChip
-                key={location.id}
-                location={location}
-                unit={unit}
-                isActive={location.id === activeLocationId}
-                onSelect={() => onSelectLocation(location.id)}
-                onRemove={() => onRemoveLocation(location.id)}
-              />
-            ))}
-          </div>
-        )}
+        {/* Grouped so the current-location button and the saved-location chips can
+            share one row on mobile (see .chipRow's mobile rule) - on desktop this
+            wrapper is display: contents, so it's invisible to layout and both children
+            sit exactly where they always did, directly in .left's own row. */}
+        <div className={styles.chipRow}>
+          <CurrentLocationButton onLocate={onAddLocation} onError={onGeoError} />
+          {locations.length > 0 && (
+            <div className={styles.locations}>
+              {locations.map((location) => (
+                <LocationChip
+                  key={location.id}
+                  location={location}
+                  unit={unit}
+                  isActive={location.id === activeLocationId}
+                  onSelect={() => onSelectLocation(location.id)}
+                  onRemove={() => onRemoveLocation(location.id)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
       <div className={styles.right}>
         <ThemeSelector theme={theme} onChange={onThemeChange} />
