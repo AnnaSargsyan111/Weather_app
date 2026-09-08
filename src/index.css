@@ -42,6 +42,11 @@ body {
   --glass-bg: rgba(255, 255, 255, 0.55);
   --glass-border: rgba(255, 255, 255, 0.6);
   --glass-blur: 20px;
+  /* Same base tone as --glass-bg, just fully opaque - only used by the sticky Header
+     on mobile (see Header.module.css), where scrolled content passing underneath was
+     visible through the normal translucent glass background. Not used anywhere else,
+     so every other glass surface (cards, section pills, etc.) is unaffected. */
+  --glass-bg-solid: rgb(255, 255, 255);
 
   --radius-sm: 8px;
   --radius-md: 14px;
@@ -81,6 +86,7 @@ body {
 
   --glass-bg: rgba(20, 22, 28, 0.45);
   --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-bg-solid: rgb(20, 22, 28);
 }
 
 /* Light theme + real nighttime: every card is forced to one unified solid dark
@@ -104,6 +110,7 @@ body {
 
   --glass-bg: #1e293b;
   --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-bg-solid: #1e293b;
 }
 
 body {

@@ -64,4 +64,12 @@
   .locations {
     width: 100%;
   }
+
+  .header {
+    /* Same base color as the desktop glass header, just fully opaque - on mobile,
+       scrolled sections passing underneath the sticky header were visible through its
+       normal 45%-alpha background (blur alone doesn't fully hide sharp text/icons).
+       Desktop keeps the translucent --glass-bg unchanged. */
+    background: var(--glass-bg-solid);
+  }
 }

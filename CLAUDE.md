@@ -789,6 +789,33 @@ fix - centering math confirmed empirically: the visible shift equals half the ad
 top-margin (add 40px of margin-top, modal moves down 20px), consistent with how
 `align-items: center` centers a flex item's full margin box.
 
+## Header showing scrolled content through it on mobile - opacity, not z-index
+
+On mobile, scrolled sections (confirmed with the forecast calendar's day-cell grid,
+which is content-heavy enough to make it obvious) were visibly bleeding through the
+sticky Header while scrolling - not rendering on top of it, *through* it. Audited the
+full stacking picture first rather than reaching for a z-index bump: every `z-index` in
+the app (`grep -rn z-index src`) already forms a clean, correctly-ordered hierarchy -
+atmosphere background at `-1`, local dropdown/tooltip chrome at `20-50`, `SideNav` at
+`900`, `Header` at `1050`, content tooltips/warnings at `1200-1300`, the temperature
+converter modal (portaled to `document.body`) at `1400` - and no page-content ancestor
+carries `transform`/`filter`/`opacity`/`will-change`/`isolation`/`contain` that could
+put it in a competing stacking context above the header. So this was never a paint-order
+bug: `Header` is genuinely correct in front. The actual cause was `.header`'s
+`background: var(--glass-bg)` - only 45% alpha - which a 20px backdrop-blur alone
+doesn't fully hide sharp text/icons behind, especially the forecast grid's bold
+temperature numbers and colored condition icons.
+
+Fixed by adding `--glass-bg-solid` (same base RGB as `--glass-bg` per theme, alpha 1)
+in [index.css](weather-app/src/index.css), used *only* by `.header` inside its existing
+`@media (max-width: 640px)` block in
+[Header.module.css](weather-app/src/components/Header/Header.module.css) - every other
+glass surface in the app (cards, section-title pills, `WhatToWear`, news cards) still
+reads `--glass-bg` unchanged, and desktop's header keeps its original translucent look
+(confirmed via computed style: `rgba(20, 22, 28, 0.45)` unchanged above 640px). The
+header's own dropdowns (`ThemeSelector`, the °C/°F menu) already used the fully opaque
+`--color-surface` token, not `--glass-bg`, so they were never part of this bug.
+
 ## Roadmap ideas (not yet built)
 
 - Optional Google Maps mode behind a `VITE_GOOGLE_MAPS_API_KEY` env var, if Anna decides
