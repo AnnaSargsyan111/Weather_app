@@ -45,11 +45,22 @@ export default function App() {
   // the same `scene.isNight` the background already uses, so the override activates
   // exactly when the background is actually showing its night look.
   useEffect(() => {
-    if (theme === "light" && scene?.isNight) {
+    const isNightLight = theme === "light" && scene?.isNight;
+    if (isNightLight) {
       document.documentElement.setAttribute("data-night-light", "true");
     } else {
       document.documentElement.removeAttribute("data-night-light");
     }
+
+    // Keeps the browser's own native chrome (mobile Safari's/in-app browsers' toolbar
+    // tint) matched to the app's actual current header color - the same three colors
+    // --glass-bg-solid resolves to for each of these states (see index.css). Without
+    // this, that native chrome falls back to its own default and can show as a
+    // mismatched strip of color above the header, which looks like the header itself
+    // is see-through even though it isn't - that chrome is outside the document, no
+    // page CSS can reach it, only this meta tag can influence it.
+    const themeColor = isNightLight ? "#1e293b" : theme === "dark" ? "#14161c" : "#ffffff";
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", themeColor);
   }, [theme, scene?.isNight]);
   // Single source of truth for "the current local time at this location" - shared by
   // CurrentWeather and WeatherDetailsSection so they can never show two different times.

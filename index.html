@@ -3,6 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Kept in sync with the app's actual header background at runtime (see App.jsx) -
+       without this, mobile browsers/in-app browsers (Safari, Telegram's WebView, etc.)
+       pick their own default tint for their native toolbar/status-bar chrome, which can
+       show as a mismatched color strip above the app's own header during scroll - a
+       platform-chrome artifact no page CSS can reach, since it's outside the document
+       entirely. This value is the default (dark theme) header color; App.jsx updates it
+       live when the theme or the night+light override changes. -->
+  <meta name="theme-color" content="#14161c" />
   <title>Weather</title>
 </head>
 <body>

@@ -852,6 +852,32 @@ other, trust a behavioral test over a geometry read: setting `scrollLeft` and re
 back, or comparing `scrollWidth`/`clientWidth` on the specific element in question, over
 `window.innerWidth` specifically.
 
+## theme-color: the header fix and the *browser's own chrome* are two different things
+
+A real-device screenshot (iPhone 13, Telegram's in-app browser) after the header
+opacity/z-index fix above still showed a mismatched color strip - but circled around
+the *browser's own toolbar* (Telegram's "TELEGRAM" pill, URL bar, X, "···" menu), not
+the app's `<header>`. The app's own header, visible just below that toolbar in the same
+screenshot, was correctly solid/opaque with no bleed-through - that fix holds. What was
+still showing through was the native browser/WebView chrome itself, which sits *outside*
+the document entirely - no page CSS, z-index, or opacity can reach it, no matter how
+correct the page's own stacking is.
+
+The one lever a page does have over that chrome is `<meta name="theme-color">` - it
+tells the browser what color to paint that native UI. This app had none, so it fell
+back to the browser's own default (which can look like a mismatched "bleed-through"
+strip during the toolbar's own scroll-driven show/hide animation). Added a static
+default in [index.html](weather-app/index.html) (`#14161c`, the dark-theme header
+color) plus a live update in the same `useEffect` in
+[App.jsx](weather-app/src/App.jsx) that already computes the night+light override -
+reuses the exact same three colors `--glass-bg-solid` resolves to (`#ffffff` light,
+`#14161c` dark, `#1e293b` light+night), so the native chrome tint can never disagree
+with what the header actually looks like. Verified all three states update correctly
+(switching theme, switching to a real daytime vs. nighttime location) via
+`document.querySelector('meta[name="theme-color"]')` - the actual native-chrome-tinting
+effect itself can only be confirmed on a real device/browser, not in this session's
+Browser pane, since it's browser UI, not page content.
+
 ## Roadmap ideas (not yet built)
 
 - Optional Google Maps mode behind a `VITE_GOOGLE_MAPS_API_KEY` env var, if Anna decides
