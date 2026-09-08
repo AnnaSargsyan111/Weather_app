@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { celsiusToFahrenheit, fahrenheitToCelsius, roundForDisplay } from "../../utils/temperature.js";
 import styles from "./TemperatureConverterModal.module.css";
 
@@ -57,7 +58,7 @@ export default function TemperatureConverterModal({ open, onClose }) {
     setCelsius(raw === "" || Number.isNaN(num) ? "" : roundForDisplay(fahrenheitToCelsius(num)));
   }
 
-  return (
+  return createPortal(
     <div
       className={`${styles.overlay} ${closing ? styles.overlayClosing : ""}`}
       onMouseDown={handleClose}
@@ -116,6 +117,7 @@ export default function TemperatureConverterModal({ open, onClose }) {
           </span>
         </p>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

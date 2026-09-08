@@ -31,7 +31,10 @@
 .modal {
   width: 100%;
   max-width: 380px;
-  margin: 16px;
+  /* Asymmetric on purpose - .overlay centers the modal's margin box, so a larger
+     top margin than bottom nudges it slightly below dead-center rather than
+     repositioning it outright. */
+  margin: 56px 16px 16px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);

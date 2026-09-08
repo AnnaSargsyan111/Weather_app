@@ -756,6 +756,39 @@ mobile, which reduces but doesn't eliminate the earlier-reported text-clipping o
 instead of the vertical center) - no longer blocks any functionality, but still cosmetic
 and still open if wanted.
 
+## TemperatureConverterModal: backdrop-filter silently breaks `position: fixed`
+
+The modal's title bar and close button could disappear entirely - not just look
+cramped - on shorter viewports (confirmed reproducible around ~400-450px tall, but the
+underlying cause makes it a matter of degree, not a hard cutoff). Root cause had nothing
+to do with margins or centering math: [TemperatureConverterModal.jsx](weather-app/src/components/TemperatureUnitSelector/TemperatureConverterModal.jsx)
+rendered inline (no portal) inside `TemperatureUnitSelector`, itself inside `<Header>` -
+and `Header.module.css`'s `.header` has `backdrop-filter: blur(20px)` for its glass
+look. Per spec, a computed `filter` or `backdrop-filter` other than `none` creates a new
+*containing block* for `position: fixed`/`absolute` descendants, the same way
+`transform` does - a gotcha easy to miss since most mental checklists for "what breaks
+fixed positioning" stop at `transform`/`will-change`/`contain`/`perspective`. So the
+modal's `.overlay` (meant to be `position: fixed; inset: 0` against the real viewport)
+was actually confined to `<Header>`'s own ~84px-tall box - confirmed by measuring the
+overlay's own `getBoundingClientRect()`, not just the modal's. Centering a 224px-tall
+modal inside an 84px box pushes roughly 70px of it above y=0, off-screen, with no
+scrollbar or visual cue that anything's wrong - it just silently loses its title/close
+button below a certain viewport height.
+
+Fixed the actual cause with `createPortal(..., document.body)` (the same pattern
+[InfoTooltip](weather-app/src/components/InfoTooltip/InfoTooltip.jsx) already uses,
+for what's likely this same class of reason) rather than papering over it with a bigger
+margin - a margin adjustment alone would only ever have been correct for one specific
+viewport height, since the real container was never the viewport to begin with. Verified
+by measuring the overlay's rect before/after (constrained to ~84px tall before, full
+`window.innerHeight` after) and confirming the close button escapes visibility at a
+deliberately short 400px-tall test viewport, not just eyeballing a screenshot at one
+size. `.modal`'s own `margin: 56px 16px 16px` (asymmetric top vs. the original uniform
+16px) is the actual "sit slightly lower than dead-center" requested on top of the real
+fix - centering math confirmed empirically: the visible shift equals half the added
+top-margin (add 40px of margin-top, modal moves down 20px), consistent with how
+`align-items: center` centers a flex item's full margin box.
+
 ## Roadmap ideas (not yet built)
 
 - Optional Google Maps mode behind a `VITE_GOOGLE_MAPS_API_KEY` env var, if Anna decides
